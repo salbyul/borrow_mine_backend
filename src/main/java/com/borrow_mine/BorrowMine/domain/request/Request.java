@@ -1,17 +1,21 @@
-package com.borrow_mine.BorrowMine.domain;
+package com.borrow_mine.BorrowMine.domain.request;
 
-import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.borrow.State;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class Bookmark {
+public class Request {
 
     @Id @GeneratedValue
-    @Column(name = "bookmark_id")
+    @Column(name = "request_id")
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private State state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "borrow_post_id")

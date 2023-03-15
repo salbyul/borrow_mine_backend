@@ -3,9 +3,9 @@ package com.borrow_mine.BorrowMine.domain.borrow;
 import com.borrow_mine.BorrowMine.domain.Bookmark;
 import com.borrow_mine.BorrowMine.domain.Image;
 import com.borrow_mine.BorrowMine.domain.member.Member;
-import com.borrow_mine.BorrowMine.domain.Period;
 import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.request.Request;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @Table(name = "borrow_post")
 public class BorrowPost {
 

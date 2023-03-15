@@ -19,11 +19,11 @@ public class Chat {
     private String imageName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from")
+    @JoinColumn(name = "member_from")
     private Member from;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to")
+    @JoinColumn(name = "member_to")
     private Member to;
 
     @Column(name = "created_date")

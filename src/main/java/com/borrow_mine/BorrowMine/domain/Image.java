@@ -1,10 +1,12 @@
 package com.borrow_mine.BorrowMine.domain;
 
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class Image {
 
     @Id @GeneratedValue

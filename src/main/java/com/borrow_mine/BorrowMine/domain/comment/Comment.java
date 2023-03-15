@@ -18,6 +18,7 @@ public class Comment {
 
     private String content;
 
+    @Enumerated(EnumType.STRING)
     private State state;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,4 +1,4 @@
-package com.borrow_mine.BorrowMine.domain;
+package com.borrow_mine.BorrowMine.domain.borrow;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

@@ -1,4 +1,4 @@
-package com.borrow_mine.BorrowMine.repository;
+package com.borrow_mine.BorrowMine.repository.borrow;
 
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.querydsl.core.types.Projections;

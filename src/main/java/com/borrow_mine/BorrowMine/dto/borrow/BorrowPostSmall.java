@@ -3,6 +3,8 @@ package com.borrow_mine.BorrowMine.dto.borrow;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class BorrowPostSmall {
@@ -11,7 +13,6 @@ public class BorrowPostSmall {
     private String title;
     private LocalDateTime createdDate;
     private String nickname;
-    private String imageName;
-    private byte[] image;
+    private List<ImageDto> imageDtoList = new ArrayList<>();
 
 }

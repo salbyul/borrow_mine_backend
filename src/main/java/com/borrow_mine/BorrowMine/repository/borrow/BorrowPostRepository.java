@@ -1,4 +1,4 @@
-package com.borrow_mine.BorrowMine.repository;
+package com.borrow_mine.BorrowMine.repository.borrow;
 
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import org.springframework.data.jpa.repository.JpaRepository;

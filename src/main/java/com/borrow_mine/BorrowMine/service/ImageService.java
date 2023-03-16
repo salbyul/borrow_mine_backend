@@ -2,7 +2,7 @@ package com.borrow_mine.BorrowMine.service;
 
 import com.borrow_mine.BorrowMine.domain.Image;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
-import com.borrow_mine.BorrowMine.repository.ImageRepository;
+import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class ImageService {
     @Value("${image.dir}")
     private String path;
 
-    public List<ImageDto> getImageDtoList(Long borrowPostId) {
+    public List<ImageDto> getImageDtoByBorrowPostId(Long borrowPostId) {
         List<Image> images = imageRepository.findByBorrowPostId(borrowPostId);
         return images.stream().map(i -> {
             try {
@@ -35,9 +36,8 @@ public class ImageService {
         }).collect(Collectors.toList());
     }
 
-    public List<ImageDto> getImageDtoByImageName(String imageName) throws IOException {
-//        return new ImageDto(Files.readAllBytes(new File(path + imageName).toPath()), imageName);
-        return null;
+    public byte[] imageNameToImage(String imageName) throws IOException {
+        return Files.readAllBytes(new File(path + imageName).toPath());
     }
 
 }

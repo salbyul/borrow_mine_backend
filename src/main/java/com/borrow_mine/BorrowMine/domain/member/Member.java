@@ -5,7 +5,9 @@ import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.request.Request;
+import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Member {
 
     @Id @GeneratedValue
@@ -21,6 +24,8 @@ public class Member {
     private Long id;
 
     private String email;
+
+    private String password;
 
     private String nickname;
 
@@ -49,4 +54,14 @@ public class Member {
 
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
+
+    public Member(MemberJoinDto memberJoinDto) {
+        this.email = memberJoinDto.getEmail();
+        this.password = memberJoinDto.getPassword();
+        this.nickname = memberJoinDto.getNickname();
+        this.address = memberJoinDto.getAddress();
+        this.createdDate = LocalDateTime.now();
+        this.modifiedDate = LocalDateTime.now();
+        this.state = State.ACTIVATE;
+    }
 }

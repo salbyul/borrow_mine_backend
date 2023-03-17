@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 public class BorrowResponse {
 
+//    TODO 좋은 설계 생각하기
     private List<BorrowPostSmall> borrowPosts;
 
     public static BorrowResponse assembleBorrowSmallList(List<BorrowPostSmall> list) {

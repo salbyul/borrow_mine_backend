@@ -1,5 +1,6 @@
 package com.borrow_mine.BorrowMine.domain.member;
 
+import com.borrow_mine.BorrowMine.domain.Address;
 import com.borrow_mine.BorrowMine.domain.Bookmark;
 import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
@@ -29,7 +30,8 @@ public class Member {
 
     private String nickname;
 
-    private String address;
+    @Embedded
+    private Address address;
 
     @Enumerated(EnumType.STRING)
     private State state;
@@ -59,7 +61,7 @@ public class Member {
         this.email = memberJoinDto.getEmail();
         this.password = memberJoinDto.getPassword();
         this.nickname = memberJoinDto.getNickname();
-        this.address = memberJoinDto.getAddress();
+        this.address = new Address(memberJoinDto.getAddress(), memberJoinDto.getZipcode());
         this.createdDate = LocalDateTime.now();
         this.modifiedDate = LocalDateTime.now();
         this.state = State.ACTIVATE;

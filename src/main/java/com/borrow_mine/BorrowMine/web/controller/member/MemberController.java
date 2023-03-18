@@ -6,17 +6,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/member")
 public class MemberController {
 
     private final MemberService memberService;
 
 //    TODO ResponseEntity 그대로 던져도 될까?
-    @PostMapping("/member/join")
-    public ResponseEntity joinMember(@RequestBody MemberJoinDto memberJoinDto) {
+    @PostMapping("/join")
+    public ResponseEntity joinMember(@Valid @RequestBody MemberJoinDto memberJoinDto) {
 
         memberService.join(memberJoinDto);
 

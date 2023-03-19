@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.NoSuchElementException;
+
 @Slf4j
 @RestControllerAdvice(basePackageClasses = {MemberController.class})
 public class MemberControllerAdvice {
@@ -31,5 +33,12 @@ public class MemberControllerAdvice {
     public ErrorResult forbiddenAccess(MethodArgumentNotValidException e) {
         log.error("Forbidden Access: [{}]", e.getMessage());
         return new ErrorResult("Forbidden Access", 0);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoSuchElementException.class)
+    public ErrorResult failedLogin(NoSuchElementException e) {
+        log.error("Login Failed");
+        return new ErrorResult("Login failed", 1);
     }
 }

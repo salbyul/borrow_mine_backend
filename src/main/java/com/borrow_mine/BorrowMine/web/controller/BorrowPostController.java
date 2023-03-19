@@ -12,6 +12,7 @@ public class BorrowPostController {
 
     private final BorrowPostPresentationService borrowPostPresentationService;
 
+//    TODO 이미지 가져올 때 포스트의 모든 정보를 가져오는 것 손봐야 할 것 같은 느낌
     @GetMapping("/borrow/small_list")
     public BorrowResponse getSmallList() {
         return borrowPostPresentationService.getSmallBorrowPost();

@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotEmpty;
 
+// TODO Setter 제거
 @Getter
 @Setter
 public class MemberJoinDto {

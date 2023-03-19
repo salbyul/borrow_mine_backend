@@ -2,6 +2,7 @@ package com.borrow_mine.BorrowMine.service;
 
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
+import com.borrow_mine.BorrowMine.dto.member.MemberLoginDto;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,5 +45,10 @@ public class MemberService {
         if (findMember.isPresent()) {
             throw new IllegalStateException("Member Email Duplicate");
         }
+    }
+
+    public Member login(MemberLoginDto memberLoginDto) {
+        Optional<Member> findMember = memberRepository.findMemberByEmailAndPassword(memberLoginDto.getEmail(), memberLoginDto.getPassword());
+        return findMember.orElseThrow();
     }
 }

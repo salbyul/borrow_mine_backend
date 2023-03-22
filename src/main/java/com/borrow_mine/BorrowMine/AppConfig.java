@@ -27,11 +27,11 @@ public class AppConfig implements WebMvcConfigurer {
 
 //    TODO mapping 설정
     @Bean
-    public FilterRegistrationBean jwtTokenFilter() {
+    public FilterRegistrationBean<Filter> jwtTokenFilter() {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new JwtTokenFilter(jwtTokenProvider));
         filterRegistrationBean.setOrder(1);
-        filterRegistrationBean.addUrlPatterns("/header", "/comment/save");
+        filterRegistrationBean.addUrlPatterns("/header", "/comment/save", "/borrow/report/*", "/comment/report/*");
         return filterRegistrationBean;
     }
 }

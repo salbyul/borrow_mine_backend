@@ -16,6 +16,7 @@ public class MemberJoinDto {
     private String email;
 
     @NotEmpty
+    @Length(min = 8)
     private String password;
 
     @NotEmpty

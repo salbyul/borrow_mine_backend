@@ -8,10 +8,7 @@ import com.borrow_mine.BorrowMine.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -27,7 +24,7 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
 
     //    TODO ResponseEntity 그대로 던져도 될까?
-    @PostMapping("/join")
+    @PutMapping("/join")
     public ResponseEntity<String> joinMember(@Valid @RequestBody MemberJoinDto memberJoinDto) {
         memberService.join(memberJoinDto);
         return ResponseEntity.ok().build();

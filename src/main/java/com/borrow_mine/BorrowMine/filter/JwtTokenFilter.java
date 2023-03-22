@@ -1,14 +1,12 @@
 package com.borrow_mine.BorrowMine.filter;
 
 import com.borrow_mine.BorrowMine.jwt.JwtTokenProvider;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Iterator;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -3,6 +3,9 @@ package com.borrow_mine.BorrowMine.domain.comment;
 import com.borrow_mine.BorrowMine.domain.Report;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.dto.comment.CommentSaveDto;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -10,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@NoArgsConstructor
 public class Comment {
 
     @Id @GeneratedValue
@@ -34,4 +39,13 @@ public class Comment {
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
+
+    public Comment(CommentSaveDto commentSaveDto, BorrowPost borrowPost, Member member) {
+        this.content = commentSaveDto.getContent();
+        this.state = State.ACTIVATE;
+        this.borrowPost = borrowPost;
+        this.member = member;
+        this.createdDate = LocalDateTime.now();
+    }
+
 }

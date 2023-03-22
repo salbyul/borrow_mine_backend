@@ -10,13 +10,13 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Setter(value = AccessLevel.PRIVATE)
 @Getter
-public class BorrowResponse {
+public class BorrowListResponse {
 
 //    TODO 좋은 설계 생각하기
     private List<BorrowPostSmall> borrowPosts;
 
-    public static BorrowResponse assembleBorrowSmallList(List<BorrowPostSmall> list) {
-        BorrowResponse borrowResponse = new BorrowResponse();
+    public static BorrowListResponse assembleBorrowSmallList(List<BorrowPostSmall> list) {
+        BorrowListResponse borrowResponse = new BorrowListResponse();
         borrowResponse.setBorrowPosts(list);
         return borrowResponse;
     }

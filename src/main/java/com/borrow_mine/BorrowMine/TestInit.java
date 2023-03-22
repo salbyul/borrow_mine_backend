@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class TestInit {
 
@@ -31,5 +31,7 @@ public class TestInit {
         memberJoinDto2.setZipcode("99999");
         memberRepository.save(new Member(memberJoinDto1));
         memberRepository.save(new Member(memberJoinDto2));
+
+
     }
 }

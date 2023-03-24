@@ -1,9 +1,11 @@
-package com.borrow_mine.BorrowMine.web.controller;
+package com.borrow_mine.BorrowMine.web.controller.borrow;
 
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetailResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
+import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.service.*;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @RequestMapping("/borrow")
 public class BorrowPostController {
 
+    private final MemberRepository memberRepository;
     private final BorrowPostPresentationService borrowPostPresentationService;
     private final BorrowPostService borrowPostService;
     private final ImageService imageService;
@@ -42,7 +45,8 @@ public class BorrowPostController {
     @PutMapping("/report/{id}")
     public ResponseEntity<Object> report(@PathVariable("id") Long borrowPostId, HttpServletRequest request) {
         String nickname = (String) request.getAttribute("nickname");
-        reportService.reportBorrowPost(borrowPostId, Optional.of(nickname).orElseThrow());
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        reportService.reportBorrowPost(borrowPostId, findMember.orElseThrow());
         return ResponseEntity.ok().build();
     }
 }

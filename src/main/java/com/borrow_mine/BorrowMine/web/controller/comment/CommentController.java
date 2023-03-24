@@ -1,4 +1,4 @@
-package com.borrow_mine.BorrowMine.web.controller;
+package com.borrow_mine.BorrowMine.web.controller.comment;
 
 import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.member.Member;
@@ -35,10 +35,9 @@ public class CommentController {
 
     @PutMapping("/report/{id}")
     public ResponseEntity<Object> report(HttpServletRequest request, @PathVariable("id") Long commentId) {
-        System.out.println("commentId = " + commentId);
         String nickname = (String) request.getAttribute("nickname");
-        System.out.println("nickname = " + nickname);
-        reportService.reportComment(commentId, nickname);
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        reportService.reportComment(commentId, findMember.orElseThrow());
         return ResponseEntity.ok().build();
     }
 }

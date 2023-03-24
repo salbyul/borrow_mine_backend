@@ -23,6 +23,18 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .from(borrowPost)
                 .leftJoin(borrowPost.member, member)
                 .orderBy(borrowPost.createdDate.desc())
+                .limit(2)
+                .fetch();
+    }
+
+//    TODO Paging 기능 추가해야함
+    @Override
+    public List<BorrowPostSmall> getBorrowPostSmallPaging(Integer offset, Integer limit) {
+        return queryFactory
+                .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
+                .from(borrowPost)
+                .leftJoin(borrowPost.member, member)
+                .orderBy(borrowPost.createdDate.desc())
                 .limit(8)
                 .fetch();
     }

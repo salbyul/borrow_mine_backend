@@ -1,9 +1,7 @@
 package com.borrow_mine.BorrowMine.web.controller.comment;
 
-import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.comment.CommentSaveDto;
-import com.borrow_mine.BorrowMine.repository.CommentRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.CommentService;
 import com.borrow_mine.BorrowMine.service.ReportService;

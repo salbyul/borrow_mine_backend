@@ -1,6 +1,7 @@
 package com.borrow_mine.BorrowMine.service;
 
 import com.borrow_mine.BorrowMine.domain.Image;
+import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
@@ -32,6 +33,17 @@ public class BorrowPostPresentationService {
 
 
         return BorrowListResponse.assembleBorrowSmallList(borrowPostSmalls);
+    }
+
+    public BorrowListResponse getSmallBorrowPostPaging(Integer offset) {
+        List<BorrowPostSmall> borrowPostSmalls = borrowPostRepository.getBorrowPostSmallPaging(offset, 8);
+        List<Long> ids = borrowPostSmalls.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
+        List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
+
+        addImageDtoList(borrowPostSmalls, images);
+
+
+        return BorrowListResponse.assembleBorrowSmallList(borrowPostSmalls, offset);
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {

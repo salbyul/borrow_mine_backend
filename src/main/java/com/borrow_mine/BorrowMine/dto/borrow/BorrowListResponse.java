@@ -14,10 +14,18 @@ public class BorrowListResponse {
 
 //    TODO 좋은 설계 생각하기
     private List<BorrowPostSmall> borrowPosts;
+    private int offset;
 
     public static BorrowListResponse assembleBorrowSmallList(List<BorrowPostSmall> list) {
         BorrowListResponse borrowResponse = new BorrowListResponse();
         borrowResponse.setBorrowPosts(list);
+        return borrowResponse;
+    }
+
+    public static BorrowListResponse assembleBorrowSmallList(List<BorrowPostSmall> list, int offset) {
+        BorrowListResponse borrowResponse = new BorrowListResponse();
+        borrowResponse.setBorrowPosts(list);
+        borrowResponse.setOffset(offset);
         return borrowResponse;
     }
 }

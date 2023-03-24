@@ -1,12 +1,10 @@
 package com.borrow_mine.BorrowMine.web.controller.borrow;
 
-import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetailResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
-import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +31,14 @@ public class BorrowPostController {
         return borrowPostPresentationService.getSmallBorrowPost();
     }
 
+    @GetMapping("/list")
+    public BorrowListResponse getList() {
+        return borrowPostPresentationService.getSmallBorrowPostPaging(0);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<BorrowDetailResponse> getBorrowDetail(@PathVariable("id") Long borrowPostId) {
+
         BorrowDetail detail = borrowPostService.getDetail(borrowPostId);
         detail.setImageDtoList(imageService.getImageDtoByBorrowPostId(borrowPostId));
         detail.setCommentDtoList(commentService.getCommentDtoList(borrowPostId));

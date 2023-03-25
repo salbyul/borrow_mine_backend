@@ -4,13 +4,19 @@ import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetailResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
+import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -52,5 +58,23 @@ public class BorrowPostController {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
         reportService.reportBorrowPost(borrowPostId, findMember.orElseThrow());
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/create")
+    public ResponseEntity<Map<String, Object>> create(@RequestPart BorrowPostSaveDto borrowPostSaveDto, @RequestPart List<MultipartFile> imageList, HttpServletRequest request) throws IOException {
+        String nickname = (String) request.getAttribute("nickname");
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        Long id = borrowPostService.saveBorrowPost(borrowPostSaveDto, imageList, findMember.orElseThrow());
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("id", id);
+        return ResponseEntity.ok(responseMap);
+    }
+
+    @GetMapping("/product/{name}")
+    public ResponseEntity<Map<String, Object>> recommendProductName(@PathVariable String name) {
+        List<String> productNames = borrowPostService.recommendProductName(name);
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("productNames", productNames);
+        return ResponseEntity.ok(responseMap);
     }
 }

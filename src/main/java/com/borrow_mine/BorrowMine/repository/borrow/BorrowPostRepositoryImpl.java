@@ -38,4 +38,13 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .limit(8)
                 .fetch();
     }
+//    %name%가 맞나
+    public List<String> getProductName(String name) {
+        return queryFactory
+                .select(borrowPost.product)
+                .from(borrowPost)
+                .where(borrowPost.product.contains(name))
+                .distinct()
+                .fetch();
+    }
 }

@@ -1,18 +1,22 @@
 package com.borrow_mine.BorrowMine.domain.borrow;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class Period {
 
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 }

@@ -35,7 +35,8 @@ public class JwtTokenProvider {
         claims.put("nickname", nickname);
 
         Date expireTime = new Date();
-        expireTime.setTime(expireTime.getTime() + 60 * 30 * 1000);
+//        TODO 시간 바꿔야함!!
+        expireTime.setTime(expireTime.getTime() + 6000 * 30 * 1000);
 
         JwtBuilder builder = Jwts.builder()
                 .setHeader(headerMap)

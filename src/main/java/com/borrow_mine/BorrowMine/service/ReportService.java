@@ -8,6 +8,7 @@ import com.borrow_mine.BorrowMine.repository.CommentRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.report.ReportRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,13 +44,13 @@ public class ReportService {
 //    TODO RuntimeException 맞나?
     private void validateDuplicateReportBorrowPost(BorrowPost borrowPost, Member member) {
         if (reportRepository.findByMemberAndBorrowPostId(borrowPost, member).isPresent()) {
-            throw new RuntimeException("DUPLICATE REPORT BY BORROW_POST");
+            throw new DuplicateRequestException("DUPLICATE REPORT BY BORROW_POST");
         }
     }
 
     private void validateDuplicateReportComment(Comment comment, Member member) {
         if (reportRepository.findByMemberAndComment(comment, member).isPresent()) {
-            throw new RuntimeException("DUPLICATE REPORT BY COMMENT");
+            throw new DuplicateRequestException("DUPLICATE REPORT BY COMMENT");
         }
     }
 }

@@ -8,4 +8,6 @@ public interface BorrowPostRepositoryCustom {
 
     List<BorrowPostSmall> getBorrowPostSmall();
     List<BorrowPostSmall> getBorrowPostSmallPaging(Integer offset, Integer limit);
+
+    List<String> getProductName(String name);
 }

@@ -43,8 +43,9 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
         return queryFactory
                 .select(borrowPost.product)
                 .from(borrowPost)
-                .where(borrowPost.product.contains(name))
+                .where(borrowPost.product.containsIgnoreCase(name))
                 .distinct()
+                .limit(6)
                 .fetch();
     }
 }

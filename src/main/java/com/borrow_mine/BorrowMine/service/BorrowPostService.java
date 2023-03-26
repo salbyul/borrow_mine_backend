@@ -1,9 +1,11 @@
 package com.borrow_mine.BorrowMine.service;
 
+import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
+import com.borrow_mine.BorrowMine.repository.StatisticRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class BorrowPostService {
 
     private final BorrowPostRepository borrowPostRepository;
+    private final StatisticRepository statisticRepository;
     private final ImageService imageService;
 
     public BorrowDetail getDetail(Long borrowPostId) {
@@ -34,6 +37,16 @@ public class BorrowPostService {
         BorrowPost borrowPost = new BorrowPost(borrowPostSaveDto, member);
         borrowPostRepository.save(borrowPost);
         imageService.saveImage(imageList, borrowPost);
+        String product = borrowPost.getProduct();
+
+        Optional<Statistic> findStatistic = statisticRepository.findByProduct(product);
+        if (findStatistic.isEmpty()) {
+            statisticRepository.save(new Statistic(product));
+        } else {
+            Statistic statistic = findStatistic.get();
+            statistic.addNumber();
+        }
+
         return borrowPost.getId();
     }
 

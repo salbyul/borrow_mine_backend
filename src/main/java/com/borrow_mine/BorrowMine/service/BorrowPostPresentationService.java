@@ -1,18 +1,21 @@
 package com.borrow_mine.BorrowMine.service;
 
 import com.borrow_mine.BorrowMine.domain.Image;
+import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.dto.PopularProductDto;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
+import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class BorrowPostPresentationService {
 
     private final BorrowPostRepository borrowPostRepository;
+    private final StatisticRepository statisticRepository;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
 
@@ -44,6 +48,37 @@ public class BorrowPostPresentationService {
 
 
         return BorrowListResponse.assembleBorrowSmallList(borrowPostSmalls, offset);
+    }
+
+    public List<PopularProductDto> getStatisticLimitTen() {
+        List<Statistic> findStatistic = statisticRepository.findOrderByNumber(10);
+        return findStatistic.stream().map(s -> new PopularProductDto(s.getNumber(), s.getProduct())).collect(Collectors.toList());
+    }
+
+    public List<PopularProductDto> getPopularProductForWeek() {
+        List<BorrowPost> findBorrowPosts = borrowPostRepository.findForWeek();
+        Map<String, Integer> map = new HashMap<>();
+        findBorrowPosts.forEach(b -> {
+            map.put(b.getProduct(), map.getOrDefault(b.getProduct(), 0) + 1);
+        });
+        List<PopularProductDto> result = map.keySet().stream().map(k -> new PopularProductDto(map.get(k), k)).sorted().collect(Collectors.toList());
+        while (result.size() > 10) {
+            result.remove(10);
+        }
+        return result;
+    }
+
+    public List<PopularProductDto> getPopularProductForMonth() {
+        List<BorrowPost> findBorrowPosts = borrowPostRepository.findForMonth();
+        Map<String, Integer> map = new HashMap<>();
+        findBorrowPosts.forEach(b -> {
+            map.put(b.getProduct(), map.getOrDefault(b.getProduct(), 0) + 1);
+        });
+        List<PopularProductDto> result = map.keySet().stream().map(k -> new PopularProductDto(map.get(k), k)).sorted().collect(Collectors.toList());
+        while (result.size() > 10) {
+            result.remove(10);
+        }
+        return result;
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {

@@ -1,6 +1,8 @@
 package com.borrow_mine.BorrowMine.web.controller.borrow;
 
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import com.borrow_mine.BorrowMine.dto.PopularProductDto;
+import com.borrow_mine.BorrowMine.dto.PopularProductResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetailResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
@@ -76,5 +78,23 @@ public class BorrowPostController {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("productNames", productNames);
         return ResponseEntity.ok(responseMap);
+    }
+
+    @GetMapping("/popular/until-now")
+    public PopularProductResponse popularUntilNow() {
+        List<PopularProductDto> list = borrowPostPresentationService.getStatisticLimitTen();
+        return PopularProductResponse.getProductResponse(list, 10);
+    }
+
+    @GetMapping("/popular/week")
+    public PopularProductResponse popularWeek() {
+        List<PopularProductDto> list = borrowPostPresentationService.getPopularProductForWeek();
+        return PopularProductResponse.getProductResponse(list, 10);
+    }
+
+    @GetMapping("/popular/month")
+    public PopularProductResponse popularMonth() {
+        List<PopularProductDto> list = borrowPostPresentationService.getPopularProductForMonth();
+        return PopularProductResponse.getProductResponse(list, 10);
     }
 }

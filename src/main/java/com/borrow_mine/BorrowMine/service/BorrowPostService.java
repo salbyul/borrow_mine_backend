@@ -5,7 +5,7 @@ import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
-import com.borrow_mine.BorrowMine.repository.StatisticRepository;
+import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

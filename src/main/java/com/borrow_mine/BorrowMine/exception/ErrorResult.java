@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 // TODO ErrorResult exception 패키지 안에 있는 게 맞나?
+// code int -> String
 @Getter
 @AllArgsConstructor
 public class ErrorResult {

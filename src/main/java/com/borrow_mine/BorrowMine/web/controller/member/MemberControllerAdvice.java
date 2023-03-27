@@ -1,6 +1,7 @@
 package com.borrow_mine.BorrowMine.web.controller.member;
 
 import com.borrow_mine.BorrowMine.exception.ErrorResult;
+import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,7 +15,7 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice(basePackageClasses = {MemberController.class})
 public class MemberControllerAdvice {
 
-//    TODO ErrorResult message, code 생각
+    //    TODO ErrorResult message, code 생각
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalStateException.class)
     public ErrorResult memberException(IllegalStateException e) {
@@ -40,5 +41,11 @@ public class MemberControllerAdvice {
     public ErrorResult failedLogin(NoSuchElementException e) {
         log.error("Login Failed");
         return new ErrorResult("Login failed", 1);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DuplicateRequestException.class)
+    public ErrorResult duplicateDeny(DuplicateRequestException e) {
+        return new ErrorResult("DUPLICATE DENY", 123);
     }
 }

@@ -1,4 +1,4 @@
-package com.borrow_mine.BorrowMine.domain;
+package com.borrow_mine.BorrowMine.domain.chat;
 
 import com.borrow_mine.BorrowMine.domain.member.Member;
 

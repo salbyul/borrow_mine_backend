@@ -4,6 +4,7 @@ import com.borrow_mine.BorrowMine.domain.Address;
 import com.borrow_mine.BorrowMine.domain.Bookmark;
 import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.chat.ChatRoom;
 import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.request.Request;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
@@ -50,6 +51,9 @@ public class Member {
 
     @OneToMany(mappedBy = "from")
     private List<Deny> denies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "from")
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;

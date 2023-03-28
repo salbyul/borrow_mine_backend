@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import javax.persistence.EntityManager;
 
@@ -23,6 +24,11 @@ public class BorrowMineApplication {
 	@Bean
 	public JwtTokenProvider jwtTokenProvider() {
 		return new JwtTokenProvider();
+	}
+
+	@Bean
+	public ServerEndpointExporter serverEndpointExporter() {
+		return new ServerEndpointExporter();
 	}
 
 }

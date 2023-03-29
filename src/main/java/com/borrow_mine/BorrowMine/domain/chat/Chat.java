@@ -1,11 +1,18 @@
 package com.borrow_mine.BorrowMine.domain.chat;
 
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Chat {
 
     @Id
@@ -22,10 +29,22 @@ public class Chat {
     @JoinColumn(name = "member_from")
     private Member from;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_to")
     private Member to;
 
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    @Enumerated(EnumType.STRING)
+    private Type type;
+
+    @Column(name = "sent_time")
+    private LocalDateTime sentTime;
+
+    public static Chat assembleChatMessage(Member from, Member to, String message) {
+        return new Chat(null, message, null, from, to, Type.TEXT, LocalDateTime.now());
+    }
+
+    public static Chat assembleChatImage(Member from, Member to, String imageName) {
+        return new Chat(null, null, imageName, from, to, Type.TEXT, LocalDateTime.now());
+    }
 }

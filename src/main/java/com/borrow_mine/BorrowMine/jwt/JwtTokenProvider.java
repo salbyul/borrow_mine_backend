@@ -48,20 +48,19 @@ public class JwtTokenProvider {
         return result;
     }
 
-    public Boolean validateToken(HttpServletRequest request) {
+    public String validateToken(String token) {
 
-        String authorization = request.getHeader("Authorization");
-        if (authorization == null) throw new JwtException("JWT TOKEN EXCEPTION");
-
-        String token = authorization.substring(7);
+//        String authorization = request.getHeader("Authorization");
+//        if (authorization == null) throw new JwtException("JWT TOKEN EXCEPTION");
+//
+//        String token = authorization.substring(7);
         try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-            request.setAttribute("nickname", claims.get("nickname"));
-            return true;
+            return (String) claims.get("nickname");
         } catch (ExpiredJwtException e) {
             log.error("EXPIRED TOKEN");
         } catch (UnsupportedJwtException e) {
@@ -71,6 +70,6 @@ public class JwtTokenProvider {
         } catch (SecurityException | MalformedJwtException exception) {
             log.error("BAD TOKEN");
         }
-        return false;
+        return null;
     }
 }

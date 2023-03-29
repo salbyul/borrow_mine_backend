@@ -9,6 +9,8 @@ import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.*;
+import com.borrow_mine.BorrowMine.service.borrow.BorrowPostPresentationService;
+import com.borrow_mine.BorrowMine.service.borrow.BorrowPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

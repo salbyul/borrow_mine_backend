@@ -1,4 +1,4 @@
-package com.borrow_mine.BorrowMine.service;
+package com.borrow_mine.BorrowMine.service.borrow;
 
 import com.borrow_mine.BorrowMine.domain.Image;
 import com.borrow_mine.BorrowMine.domain.Statistic;
@@ -10,6 +10,7 @@ import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
 import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
+import com.borrow_mine.BorrowMine.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

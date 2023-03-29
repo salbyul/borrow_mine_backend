@@ -9,11 +9,11 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ChatResponse {
+public class ChatRoomResponse {
 
-    private List<ChatDto> chatList = new ArrayList<>();
+    private List<String> chatRoomList;
 
-    public static ChatResponse assembleChatResponse(List<ChatDto> chatList) {
-        return new ChatResponse(chatList);
+    public static ChatRoomResponse assembleChatResponse(List<String> chatRoomList) {
+        return new ChatRoomResponse(chatRoomList);
     }
 }

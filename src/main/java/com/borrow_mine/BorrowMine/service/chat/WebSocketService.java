@@ -1,9 +1,11 @@
 package com.borrow_mine.BorrowMine.service.chat;
 
 import com.borrow_mine.BorrowMine.ServerEndpointConfig;
+import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.chat.ChatDto;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
+import com.borrow_mine.BorrowMine.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class WebSocketService {
 
     private final ChatService chatService = ServerEndpointConfig.getBean(ChatService.class);
     private final MemberRepository memberRepository = ServerEndpointConfig.getBean(MemberRepository.class);
+    private final MemberService memberService = ServerEndpointConfig.getBean(MemberService.class);
 
     @OnOpen
     public void onOpen(Session session, @PathParam("nickname") String nickname) {
@@ -47,18 +50,19 @@ public class WebSocketService {
         ChatDto dto = objectMapper.readValue(message, ChatDto.class);
         System.out.println("dto = " + dto);
         System.out.println("from: " + dto.getFrom());
-        System.out.println("memberRepository = " + memberRepository);
         Optional<Member> from = memberRepository.findMemberByNickname(dto.getFrom());
         Optional<Member> to = memberRepository.findMemberByNickname(dto.getTarget());
-        chatService.saveChatMessage(from.orElseThrow(), to.orElseThrow(), dto.getMessage());
+        Member fromMember = from.orElseThrow();
+        Member toMember = to.orElseThrow();
+        chatService.saveChatMessage(fromMember, toMember, dto.getMessage());
 
-//        if (clients.containsKey(dto.getTarget())) {
-//            Session target = clients.get(dto.getTarget());
-//            target.getBasicRemote().sendText(dto.getMessage());
-//        }
-        for (String s : clients.keySet()) {
-            Session session1 = clients.get(s);
-            session1.getBasicRemote().sendText(message);
+        if (clients.containsKey(dto.getTarget())) {
+            Optional<Deny> denyOne = memberService.findDeny(fromMember, toMember);
+            Optional<Deny> denyTwo = memberService.findDeny(toMember, fromMember);
+            if (denyOne.isEmpty() && denyTwo.isEmpty()) {
+                Session target = clients.get(dto.getTarget());
+                target.getBasicRemote().sendText(objectMapper.writeValueAsString(ChatDto.transformFromTo(dto)));
+            }
         }
     }
 

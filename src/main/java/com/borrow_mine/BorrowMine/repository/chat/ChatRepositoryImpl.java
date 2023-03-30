@@ -15,7 +15,7 @@ public class ChatRepositoryImpl implements ChatRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-//    TODO LOCK
+//    TODO LOCK 일단 보류 ChatDto로 가져오지 않고 Chat 그대로 가져옴
     @Override
     public List<ChatDto> findChatDtoByFromAndTo(Member from, Member to) {
         return queryFactory

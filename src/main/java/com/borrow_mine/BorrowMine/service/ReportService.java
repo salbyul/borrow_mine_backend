@@ -41,7 +41,6 @@ public class ReportService {
         reportRepository.save(new Report(comment, member));
     }
 
-//    TODO RuntimeException 맞나?
     private void validateDuplicateReportBorrowPost(BorrowPost borrowPost, Member member) {
         if (reportRepository.findByMemberAndBorrowPostId(borrowPost, member).isPresent()) {
             throw new DuplicateRequestException("DUPLICATE REPORT BY BORROW_POST");

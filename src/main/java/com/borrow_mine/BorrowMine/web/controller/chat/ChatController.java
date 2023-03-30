@@ -51,4 +51,12 @@ public class ChatController {
         List<ChatDto> chatDtoList = chatPresentationService.getChatDtoList(findMember.orElseThrow(), targetMember.orElseThrow());
         return ChatResponse.assembleChatResponse(chatDtoList);
     }
+
+    @DeleteMapping("/chat-room/delete/{nickname}")
+    public ResponseEntity<Object> removeChatRoom(HttpServletRequest request, @PathVariable String nickname) {
+        Optional<Member> findMember = memberRepository.findMemberByNickname((String) request.getAttribute("nickname"));
+        Optional<Member> target = memberRepository.findMemberByNickname(nickname);
+        chatService.removeChatRoom(findMember.orElseThrow(), target.orElseThrow());
+        return ResponseEntity.ok().build();
+    }
 }

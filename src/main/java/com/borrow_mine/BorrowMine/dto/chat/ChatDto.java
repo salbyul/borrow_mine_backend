@@ -24,4 +24,8 @@ public class ChatDto {
     public static ChatDto chatToDto(Chat chat) {
         return new ChatDto(chat.getType().toString(), chat.getContent(), chat.getImageName(), chat.getFrom().getNickname(), chat.getTo().getNickname(), chat.getSentTime(), null);
     }
+
+    public static ChatDto transformFromTo(ChatDto chatDto) {
+        return new ChatDto(chatDto.getType(), chatDto.message, chatDto.imageName, chatDto.getTarget(), chatDto.getFrom(), chatDto.getSentTime(), chatDto.getImage());
+    }
 }

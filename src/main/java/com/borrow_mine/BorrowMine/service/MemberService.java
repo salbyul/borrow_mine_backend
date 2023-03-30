@@ -45,6 +45,10 @@ public class MemberService {
         denyRepository.save(Deny.assembleDeny(from, to));
     }
 
+    public Optional<Deny> findDeny(Member from, Member to) {
+        return denyRepository.findByFromAndTo(from, to);
+    }
+
     private void validateDuplicateMember(MemberJoinDto memberJoinDto) {
         validateEmail(memberJoinDto.getEmail());
         validateNickname(memberJoinDto.getNickname());

@@ -33,6 +33,10 @@ public class ChatService {
 
     @Transactional
     public void saveChatMessage(Member from, Member to, String message) {
+        Optional<ChatRoom> findChatRoom = chatRepository.findChatRoomByFromAndTo(to, from);
+        if (findChatRoom.isEmpty()) {
+            createChatRoom(to, from);
+        }
         Chat chat = Chat.assembleChatMessage(from, to, message);
         chatRepository.save(chat);
     }
@@ -43,6 +47,11 @@ public class ChatService {
         chatRepository.save(chat);
     }
 
+
+    @Transactional
+    public void removeChatRoom(Member from, Member to) {
+        chatRepository.deleteChatRoomByFromAndTo(from, to);
+    }
 
     private void validate(Member from, Member to) {
         if (from == to) throw new IllegalStateException("자신과의 채팅");

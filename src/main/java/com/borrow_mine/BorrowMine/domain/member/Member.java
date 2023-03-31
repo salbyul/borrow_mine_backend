@@ -8,6 +8,7 @@ import com.borrow_mine.BorrowMine.domain.chat.ChatRoom;
 import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.request.Request;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
+import com.borrow_mine.BorrowMine.dto.member.MemberModifyDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -65,9 +66,14 @@ public class Member {
         this.email = memberJoinDto.getEmail();
         this.password = memberJoinDto.getPassword();
         this.nickname = memberJoinDto.getNickname();
-        this.address = new Address(memberJoinDto.getAddress(), memberJoinDto.getZipcode());
+        this.address = memberJoinDto.getAddress();
         this.createdDate = LocalDateTime.now();
         this.modifiedDate = LocalDateTime.now();
         this.state = State.ACTIVATE;
+    }
+
+    public void modify(MemberModifyDto memberModifyDto) {
+        this.nickname = memberModifyDto.getNickname();
+        this.address = memberModifyDto.getAddress();
     }
 }

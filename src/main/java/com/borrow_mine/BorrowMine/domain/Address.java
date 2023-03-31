@@ -1,13 +1,13 @@
 package com.borrow_mine.BorrowMine.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 
 @Embeddable
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address {

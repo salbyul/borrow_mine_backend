@@ -19,12 +19,23 @@ public class MemberControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalStateException.class)
     public ErrorResult memberException(IllegalStateException e) {
+
         if (e.getMessage().equals("Member Email Duplicate")) {
             log.error("Member Email Duplicate");
             return new ErrorResult("Member Email Duplicate", 111);
-        } else if (e.getMessage().equals("Member Nickname Duplicate")) {
+        }
+
+        else if (e.getMessage().equals("Member Nickname Duplicate")) {
             log.error("Member Nickname Duplicate");
             return new ErrorResult("Member Nickname Duplicate", 222);
+        }
+
+        else if (e.getMessage().equals("Member Address Null")) {
+            log.error("Member Address Null");
+            return new ErrorResult("Forbidden Access", 0);
+        } else if (e.getMessage().equals("Member Password Error")) {
+            log.error("Member Password Error");
+            return new ErrorResult("Member Password Error", 444);
         }
         return null;
     }

@@ -20,15 +20,15 @@ public class TestInit {
         memberJoinDto1.setEmail("asdf@asdf.com");
         memberJoinDto1.setNickname("다파라요");
         memberJoinDto1.setPassword("12341234");
-        memberJoinDto1.setAddress("서울시 중구 황학동");
-        memberJoinDto1.setZipcode("04567");
+//        memberJoinDto1.setAddress("서울시 중구 황학동");
+//        memberJoinDto1.setZipcode("04567");
 
         MemberJoinDto memberJoinDto2 = new MemberJoinDto();
         memberJoinDto2.setEmail("2@2.com");
         memberJoinDto2.setNickname("집안을 거덜내자");
         memberJoinDto2.setPassword("asdfasdf");
-        memberJoinDto2.setAddress("판교");
-        memberJoinDto2.setZipcode("99999");
+//        memberJoinDto2.setAddress("판교");
+//        memberJoinDto2.setZipcode("99999");
         memberRepository.save(new Member(memberJoinDto1));
         memberRepository.save(new Member(memberJoinDto2));
 

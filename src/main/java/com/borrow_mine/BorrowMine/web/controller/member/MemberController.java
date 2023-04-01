@@ -1,6 +1,9 @@
 package com.borrow_mine.BorrowMine.web.controller.member;
 
+import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import com.borrow_mine.BorrowMine.dto.deny.DenyDto;
+import com.borrow_mine.BorrowMine.dto.deny.DenyResponse;
 import com.borrow_mine.BorrowMine.dto.member.MemberInfoDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberLoginDto;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,6 +76,21 @@ public class MemberController {
         System.out.println("memberModifyDto = " + memberModifyDto);
         String nickname = (String) request.getAttribute("nickname");
         memberService.modifyMember(nickname, memberModifyDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/deny/list")
+    public DenyResponse denyList(HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        List<DenyDto> denyList = memberService.getDenyList(findMember.orElseThrow());
+        return DenyResponse.assembleDenyResponse(denyList, denyList.size());
+    }
+
+    @DeleteMapping("/deny/delete/{id}")
+    public ResponseEntity<Object> removeDeny(@PathVariable Long id, HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        memberService.removeDeny(id, nickname);
         return ResponseEntity.ok().build();
     }
 }

@@ -42,7 +42,7 @@ public class Member {
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
-    private List<BorrowPost> borrowPosts;
+    private List<BorrowPost> borrowPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Request> requests = new ArrayList<>();

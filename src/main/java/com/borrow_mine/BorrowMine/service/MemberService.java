@@ -3,21 +3,27 @@ package com.borrow_mine.BorrowMine.service;
 import com.borrow_mine.BorrowMine.domain.Address;
 import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import com.borrow_mine.BorrowMine.dto.deny.DenyDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberLoginDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberModifyDto;
+import com.borrow_mine.BorrowMine.exception.DenyException;
 import com.borrow_mine.BorrowMine.repository.DenyRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class MemberService {
 
@@ -46,6 +52,22 @@ public class MemberService {
             throw new DuplicateRequestException("중복");
         });
         denyRepository.save(Deny.assembleDeny(from, to));
+    }
+
+    public List<DenyDto> getDenyList(Member member) {
+        List<Deny> denyList = denyRepository.findDenyByFrom(member);
+        return denyList.stream()
+                .map(d -> new DenyDto(d.getTo().getNickname(), d.getId()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void removeDeny(Long id, String from) {
+        Optional<Deny> findDeny = denyRepository.findOneById(id);
+        Deny deny = findDeny.orElseThrow();
+        if (!deny.getFrom().getNickname().equals(from))
+            throw new DenyException(DenyException.forbiddenAccess, DenyException.forbiddenAccessCode);
+        denyRepository.delete(deny);
     }
 
     @Transactional

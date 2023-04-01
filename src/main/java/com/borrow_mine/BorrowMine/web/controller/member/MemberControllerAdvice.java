@@ -1,5 +1,7 @@
 package com.borrow_mine.BorrowMine.web.controller.member;
 
+import com.borrow_mine.BorrowMine.domain.Deny;
+import com.borrow_mine.BorrowMine.exception.DenyException;
 import com.borrow_mine.BorrowMine.exception.ErrorResult;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.extern.slf4j.Slf4j;
@@ -58,5 +60,14 @@ public class MemberControllerAdvice {
     @ExceptionHandler(DuplicateRequestException.class)
     public ErrorResult duplicateDeny(DuplicateRequestException e) {
         return new ErrorResult("DUPLICATE DENY", 123);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DenyException.class)
+    public ErrorResult denyException(DenyException e) {
+        if (e.getMessage().equals(DenyException.forbiddenAccess)) {
+            return new ErrorResult(e.getMessage(), e.getCode());
+        }
+        return null;
     }
 }

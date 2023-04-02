@@ -1,6 +1,8 @@
 package com.borrow_mine.BorrowMine.repository.borrow;
 
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.member.Member;
+import com.borrow_mine.BorrowMine.domain.member.QMember;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -40,7 +42,20 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .limit(8)
                 .fetch();
     }
-//    %name%가 맞나
+
+    @Override
+    public List<BorrowPostSmall> getBorrowPostSmallByMember(Member member) {
+        return queryFactory
+                .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
+                .from(borrowPost)
+                .where(borrowPost.member.eq(member))
+                .leftJoin(borrowPost.member, QMember.member)
+                .orderBy(borrowPost.createdDate.desc())
+                .fetch();
+    }
+
+    //    %name%가 맞나
+    @Override
     public List<String> getProductName(String name) {
         return queryFactory
                 .select(borrowPost.product)
@@ -51,6 +66,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .fetch();
     }
 
+    @Override
     public List<BorrowPost> findForWeek() {
         return queryFactory
                 .selectFrom(borrowPost)
@@ -58,6 +74,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .fetch();
     }
 
+    @Override
     public List<BorrowPost> findForMonth() {
         return queryFactory
                 .selectFrom(borrowPost)

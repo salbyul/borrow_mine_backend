@@ -11,5 +11,4 @@ public interface BorrowPostRepository extends JpaRepository<BorrowPost, Long>, B
 
     @Query("select bp from BorrowPost bp left join fetch bp.member where bp.id = :id")
     Optional<BorrowPost> findBorrowPostByIdFetchMember(@Param("id") Long id);
-
 }

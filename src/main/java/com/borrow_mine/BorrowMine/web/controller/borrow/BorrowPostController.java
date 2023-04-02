@@ -99,4 +99,11 @@ public class BorrowPostController {
         List<PopularProductDto> list = borrowPostPresentationService.getPopularProductForMonth();
         return PopularProductResponse.getProductResponse(list, 10);
     }
+
+    @GetMapping("/wrote")
+    public BorrowListResponse wroteList(HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        return borrowPostPresentationService.getWroteList(findMember.orElseThrow());
+    }
 }

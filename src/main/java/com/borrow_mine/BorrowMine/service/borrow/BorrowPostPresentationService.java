@@ -3,6 +3,7 @@ package com.borrow_mine.BorrowMine.service.borrow;
 import com.borrow_mine.BorrowMine.domain.Image;
 import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.PopularProductDto;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
@@ -36,7 +37,6 @@ public class BorrowPostPresentationService {
 
         addImageDtoList(borrowPostSmalls, images);
 
-
         return BorrowListResponse.assembleBorrowSmallList(borrowPostSmalls);
     }
 
@@ -49,6 +49,16 @@ public class BorrowPostPresentationService {
 
 
         return BorrowListResponse.assembleBorrowSmallList(borrowPostSmalls, offset);
+    }
+
+    public BorrowListResponse getWroteList(Member member) {
+        List<BorrowPostSmall> borrowPostSmallList = borrowPostRepository.getBorrowPostSmallByMember(member);
+        List<Long> ids = borrowPostSmallList.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
+        List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
+
+        addImageDtoList(borrowPostSmallList, images);
+
+        return BorrowListResponse.assembleBorrowSmallList(borrowPostSmallList);
     }
 
     public List<PopularProductDto> getStatisticLimitTen() {
@@ -85,7 +95,7 @@ public class BorrowPostPresentationService {
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {
         images.forEach(i -> {
             for (BorrowPostSmall borrowPostSmall : borrowPostSmalls) {
-                if (i.getBorrowPost().getId() == borrowPostSmall.getId()) {
+                if (i.getBorrowPost().getId().equals(borrowPostSmall.getId())) {
                     try {
                         borrowPostSmall.getImageDtoList().add(new ImageDto(imageService.imageNameToImage(i.getName()), i.getName()));
                     } catch (IOException e) {

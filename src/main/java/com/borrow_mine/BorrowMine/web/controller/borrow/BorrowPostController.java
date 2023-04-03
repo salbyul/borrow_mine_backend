@@ -7,6 +7,8 @@ import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetailResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
+import com.borrow_mine.BorrowMine.dto.request.RequestDto;
+import com.borrow_mine.BorrowMine.dto.request.RequestResponse;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.*;
 import com.borrow_mine.BorrowMine.service.borrow.BorrowPostPresentationService;
@@ -107,11 +109,20 @@ public class BorrowPostController {
         return borrowPostPresentationService.getWroteList(findMember.orElseThrow());
     }
 
-    @PutMapping("/request/{id}")
-    public ResponseEntity<Object> borrowRequest(HttpServletRequest request, @PathVariable Long id) {
+    @PutMapping("/request")
+    public ResponseEntity<Object> borrowRequest(HttpServletRequest request, @RequestParam Long id) {
         String nickname = (String) request.getAttribute("nickname");
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
         borrowPostService.requestBorrow(findMember.orElseThrow(), id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/request/send")
+    public RequestResponse getSentRequest(HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        System.out.println("nickname = " + nickname);
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        List<RequestDto> requestDtoList = borrowPostPresentationService.getRequestDtoList(findMember.orElseThrow());
+        return RequestResponse.assembleRequestResponse(requestDtoList);
     }
 }

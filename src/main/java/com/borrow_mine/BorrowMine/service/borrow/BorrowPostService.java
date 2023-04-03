@@ -7,7 +7,7 @@ import com.borrow_mine.BorrowMine.domain.request.Request;
 import com.borrow_mine.BorrowMine.domain.request.State;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
-import com.borrow_mine.BorrowMine.repository.RequestRepository;
+import com.borrow_mine.BorrowMine.repository.request.RequestRepository;
 import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.service.ImageService;
@@ -59,10 +59,14 @@ public class BorrowPostService {
 
     @Transactional
     public void requestBorrow(Member member, Long borrowId) {
-        Optional<BorrowPost> findBorrowPost = borrowPostRepository.findById(borrowId);
-        List<Request> findRequestList = requestRepository.findRequestByBorrowPostAndMember(findBorrowPost.orElseThrow(), member);
+        Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdWithMember(borrowId);
+        BorrowPost borrowPost = findBorrowPost.orElseThrow();
+        if (borrowPost.getMember() == member) {
+            throw new IllegalStateException("Request Error");
+        }
+        List<Request> findRequestList = requestRepository.findRequestByBorrowPostAndMember(borrowPost, member);
         if (findRequestList.isEmpty()) {
-            requestRepository.save(new Request(null, State.WAIT, findBorrowPost.orElseThrow(), member, LocalDateTime.now()));
+            requestRepository.save(new Request(null, State.WAIT, borrowPost, member, LocalDateTime.now()));
         } else {
             throw new DuplicateRequestException("중복");
         }

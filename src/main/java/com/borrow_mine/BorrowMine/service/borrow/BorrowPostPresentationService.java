@@ -8,8 +8,10 @@ import com.borrow_mine.BorrowMine.dto.PopularProductDto;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
+import com.borrow_mine.BorrowMine.dto.request.RequestDto;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
+import com.borrow_mine.BorrowMine.repository.request.RequestRepository;
 import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import com.borrow_mine.BorrowMine.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class BorrowPostPresentationService {
 
     private final BorrowPostRepository borrowPostRepository;
+    private final RequestRepository requestRepository;
     private final StatisticRepository statisticRepository;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
@@ -90,6 +93,10 @@ public class BorrowPostPresentationService {
             result.remove(10);
         }
         return result;
+    }
+
+    public List<RequestDto> getRequestDtoList(Member member) {
+        return requestRepository.getRequestDtoListByMember(member);
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {

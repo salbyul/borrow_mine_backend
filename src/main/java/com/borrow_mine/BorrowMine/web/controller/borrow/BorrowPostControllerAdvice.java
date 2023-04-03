@@ -15,4 +15,10 @@ public class BorrowPostControllerAdvice {
     public ErrorResult duplicateReport(DuplicateRequestException e) {
         return new ErrorResult("DUPLICATE", 111);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalStateException.class)
+    public ErrorResult illegalState(IllegalStateException e) {
+        return new ErrorResult("Error", 222);
+    }
 }

@@ -33,4 +33,8 @@ public class Request {
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
+
+    public void changeState(State state) {
+        this.state = state;
+    }
 }

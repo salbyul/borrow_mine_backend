@@ -1,5 +1,6 @@
 package com.borrow_mine.BorrowMine.service.borrow;
 
+import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
@@ -7,6 +8,7 @@ import com.borrow_mine.BorrowMine.domain.request.Request;
 import com.borrow_mine.BorrowMine.domain.request.State;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
+import com.borrow_mine.BorrowMine.repository.DenyRepository;
 import com.borrow_mine.BorrowMine.repository.request.RequestRepository;
 import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
@@ -28,6 +30,7 @@ import java.util.Optional;
 public class BorrowPostService {
 
     private final BorrowPostRepository borrowPostRepository;
+    private final DenyRepository denyRepository;
     private final RequestRepository requestRepository;
     private final StatisticRepository statisticRepository;
     private final ImageService imageService;
@@ -61,6 +64,10 @@ public class BorrowPostService {
     public void requestBorrow(Member member, Long borrowId) {
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdWithMember(borrowId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
+        Optional<Deny> findDeny = denyRepository.findByFromAndTo(borrowPost.getMember(), member);
+        if (findDeny.isPresent()) {
+            throw new IllegalStateException("Deny Error");
+        }
         if (borrowPost.getMember() == member) {
             throw new IllegalStateException("Request Error");
         }
@@ -70,7 +77,24 @@ public class BorrowPostService {
         } else {
             throw new DuplicateRequestException("중복");
         }
+    }
 
+    @Transactional
+    public void acceptRequestState(Long requestId) {
+        Optional<Request> findRequest = requestRepository.findById(requestId);
+        Request request = findRequest.orElseThrow();
+        if (request.getState().equals(State.WAIT)) {
+            request.changeState(State.ACCEPT);
+        }
+    }
+
+    @Transactional
+    public void refuseRequestState(Long requestId) {
+        Optional<Request> findRequest = requestRepository.findById(requestId);
+        Request request = findRequest.orElseThrow();
+        if (request.getState().equals(State.WAIT)) {
+            request.changeState(State.REFUSE);
+        }
     }
 
     public List<String> recommendProductName(String name) {

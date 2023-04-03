@@ -117,12 +117,31 @@ public class BorrowPostController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/request/send")
+    @GetMapping("/request/sent")
     public RequestResponse getSentRequest(HttpServletRequest request) {
         String nickname = (String) request.getAttribute("nickname");
-        System.out.println("nickname = " + nickname);
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        List<RequestDto> requestDtoList = borrowPostPresentationService.getRequestDtoList(findMember.orElseThrow());
+        List<RequestDto> requestDtoList = borrowPostPresentationService.getSentRequestDtoList(findMember.orElseThrow());
         return RequestResponse.assembleRequestResponse(requestDtoList);
+    }
+
+    @GetMapping("/request/received")
+    public RequestResponse getReceivedRequest(HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        List<RequestDto> receivedRequestDtoList = borrowPostPresentationService.getReceivedRequestDtoList(findMember.orElseThrow());
+        return RequestResponse.assembleRequestResponse(receivedRequestDtoList);
+    }
+
+    @PostMapping("/request/accept")
+    public ResponseEntity<Object> acceptRequest(@RequestParam Long id) {
+        borrowPostService.acceptRequestState(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/request/refuse")
+    public ResponseEntity<Object> refuseRequest(@RequestParam Long id) {
+        borrowPostService.refuseRequestState(id);
+        return ResponseEntity.ok().build();
     }
 }

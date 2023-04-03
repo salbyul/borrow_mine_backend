@@ -9,10 +9,13 @@ import java.time.LocalDateTime;
 @Getter
 public class RequestDto {
 
+    private Long requestId;
     private Long borrowPostId;
     private String product;
     private Integer price;
     private Period period;
+    private String nickname;
+    private Long memberId;
     private LocalDateTime createdDate;
     private State state;
 }

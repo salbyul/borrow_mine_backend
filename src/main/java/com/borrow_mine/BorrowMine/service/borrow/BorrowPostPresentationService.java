@@ -95,8 +95,12 @@ public class BorrowPostPresentationService {
         return result;
     }
 
-    public List<RequestDto> getRequestDtoList(Member member) {
-        return requestRepository.getRequestDtoListByMember(member);
+    public List<RequestDto> getSentRequestDtoList(Member member) {
+        return requestRepository.getSentRequestDtoListByMember(member);
+    }
+
+    public List<RequestDto> getReceivedRequestDtoList(Member member) {
+        return requestRepository.getReceivedRequestDtoListByMember(member);
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {

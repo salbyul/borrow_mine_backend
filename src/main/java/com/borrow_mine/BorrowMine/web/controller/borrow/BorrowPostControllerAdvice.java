@@ -19,6 +19,11 @@ public class BorrowPostControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalStateException.class)
     public ErrorResult illegalState(IllegalStateException e) {
-        return new ErrorResult("Error", 222);
+        if (e.getMessage().equals("Deny Error")) {
+            return new ErrorResult("Deny Error", 333);
+        } else if (e.getMessage().equals("Request Error")) {
+            return new ErrorResult("Error", 222);
+        }
+        return null;
     }
 }

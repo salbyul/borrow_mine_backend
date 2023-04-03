@@ -106,4 +106,12 @@ public class BorrowPostController {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
         return borrowPostPresentationService.getWroteList(findMember.orElseThrow());
     }
+
+    @PutMapping("/request/{id}")
+    public ResponseEntity<Object> borrowRequest(HttpServletRequest request, @PathVariable Long id) {
+        String nickname = (String) request.getAttribute("nickname");
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        borrowPostService.requestBorrow(findMember.orElseThrow(), id);
+        return ResponseEntity.ok().build();
+    }
 }

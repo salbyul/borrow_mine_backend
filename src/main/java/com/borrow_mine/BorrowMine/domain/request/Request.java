@@ -2,12 +2,18 @@ package com.borrow_mine.BorrowMine.domain.request;
 
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
-import com.borrow_mine.BorrowMine.domain.borrow.State;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Request {
 
     @Id @GeneratedValue

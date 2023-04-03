@@ -31,7 +31,16 @@ public class AppConfig implements WebMvcConfigurer {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new JwtTokenFilter(jwtTokenProvider));
         filterRegistrationBean.setOrder(1);
-        filterRegistrationBean.addUrlPatterns("/header", "/comment/save", "/borrow/report/*", "/comment/report/*", "/borrow/create", "/borrow/wrote", "/member/deny/*", "/chat/*", "/member/info/*");
+        filterRegistrationBean.addUrlPatterns("/header",
+//                Comment
+                "/comment/save", "/comment/report/*",
+//                Borrow
+                "/borrow/report/*", "/borrow/create", "/borrow/wrote", "/borrow/request/*",
+//                Member
+                "/member/deny/*",
+                "/member/info/*",
+//                Chat
+                "/chat/*");
         return filterRegistrationBean;
     }
 }

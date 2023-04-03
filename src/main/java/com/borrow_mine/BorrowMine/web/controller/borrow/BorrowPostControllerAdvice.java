@@ -13,6 +13,6 @@ public class BorrowPostControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DuplicateRequestException.class)
     public ErrorResult duplicateReport(DuplicateRequestException e) {
-        return new ErrorResult("DUPLICATE REPORT BY BORROW_POST", 111);
+        return new ErrorResult("DUPLICATE", 111);
     }
 }

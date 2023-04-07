@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class RequestDto {
+public class RequestDto implements IRequestDto{
 
     private Long requestId;
     private Long borrowPostId;

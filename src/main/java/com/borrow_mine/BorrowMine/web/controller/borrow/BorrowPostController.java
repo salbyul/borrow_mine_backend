@@ -7,6 +7,7 @@ import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetailResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
+import com.borrow_mine.BorrowMine.dto.request.RequestAcceptDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestResponse;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
@@ -133,6 +134,14 @@ public class BorrowPostController {
         return RequestResponse.assembleRequestResponse(receivedRequestDtoList);
     }
 
+    @GetMapping("/request/accept")
+    public RequestResponse acceptedRequest(HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        List<RequestAcceptDto> acceptDtoList = borrowPostPresentationService.getAcceptedDto(findMember.orElseThrow());
+        return RequestResponse.assembleRequestAcceptedResponse(acceptDtoList);
+    }
+
     @PostMapping("/request/accept")
     public ResponseEntity<Object> acceptRequest(@RequestParam Long id) {
         borrowPostService.acceptRequestState(id);
@@ -144,4 +153,5 @@ public class BorrowPostController {
         borrowPostService.refuseRequestState(id);
         return ResponseEntity.ok().build();
     }
+
 }

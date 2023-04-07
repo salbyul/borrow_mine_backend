@@ -11,8 +11,13 @@ import java.util.List;
 public class RequestResponse {
 
     private List<RequestDto> requestDtoList;
+    private List<RequestAcceptDto> requestAcceptDtoList;
 
     public static RequestResponse assembleRequestResponse(List<RequestDto> requestDtoList) {
-        return new RequestResponse(requestDtoList);
+        return new RequestResponse(requestDtoList, null);
+    }
+
+    public static RequestResponse assembleRequestAcceptedResponse(List<RequestAcceptDto> requestAcceptDtoLIst) {
+        return new RequestResponse(null, requestAcceptDtoLIst);
     }
 }

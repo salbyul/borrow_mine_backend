@@ -7,6 +7,7 @@ import com.borrow_mine.BorrowMine.dto.deny.DenyDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberLoginDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberModifyDto;
+import com.borrow_mine.BorrowMine.dto.member.ValidateMemberDto;
 import com.borrow_mine.BorrowMine.exception.DenyException;
 import com.borrow_mine.BorrowMine.repository.DenyRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final DenyRepository denyRepository;
+    private final EncryptService encryptService;
 
     //    TODO 비밀번호 그대로 저장하면 안된다!
     @Transactional
@@ -36,13 +39,17 @@ public class MemberService {
 
         validateDuplicateMember(memberJoinDto);
 
-        Member member = new Member(memberJoinDto);
+        Member member = new Member(memberJoinDto,encryptService.encrypt(memberJoinDto.getPassword()));
         memberRepository.save(member);
     }
 
     public Member login(MemberLoginDto memberLoginDto) {
-        Optional<Member> findMember = memberRepository.findMemberByEmailAndPassword(memberLoginDto.getEmail(), memberLoginDto.getPassword());
-        return findMember.orElseThrow();
+        Optional<Member> findMember = memberRepository.findMemberByEmail(memberLoginDto.getEmail());
+        Member member = findMember.orElseThrow();
+        if (!encryptService.isMatch(memberLoginDto.getPassword(), member.getPassword())) {
+            throw new NoSuchElementException();
+        }
+        return member;
     }
 
     @Transactional
@@ -90,6 +97,17 @@ public class MemberService {
 
     public Optional<Deny> findDeny(Member from, Member to) {
         return denyRepository.findByFromAndTo(from, to);
+    }
+
+    public String validateChangePassword(ValidateMemberDto validateMemberDto) {
+        return memberRepository.findMemberWithoutPassword(validateMemberDto.getEmail(), validateMemberDto.getNickname(), validateMemberDto.getAddress()).orElseThrow();
+    }
+
+    @Transactional
+    public void changePassword(String nickname, String password) {
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        Member member = findMember.orElseThrow();
+        member.changePassword(encryptService.encrypt(password));
     }
 
     private void validateDuplicateMember(MemberJoinDto memberJoinDto) {

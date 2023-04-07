@@ -29,8 +29,8 @@ public class TestInit {
         memberJoinDto2.setPassword("asdfasdf");
 //        memberJoinDto2.setAddress("판교");
 //        memberJoinDto2.setZipcode("99999");
-        memberRepository.save(new Member(memberJoinDto1));
-        memberRepository.save(new Member(memberJoinDto2));
+//        memberRepository.save(new Member(memberJoinDto1));
+//        memberRepository.save(new Member(memberJoinDto2));
 
 
     }

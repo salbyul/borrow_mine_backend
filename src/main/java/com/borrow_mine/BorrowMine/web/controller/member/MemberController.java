@@ -1,15 +1,12 @@
 package com.borrow_mine.BorrowMine.web.controller.member;
 
-import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.deny.DenyDto;
 import com.borrow_mine.BorrowMine.dto.deny.DenyResponse;
-import com.borrow_mine.BorrowMine.dto.member.MemberInfoDto;
-import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
-import com.borrow_mine.BorrowMine.dto.member.MemberLoginDto;
-import com.borrow_mine.BorrowMine.dto.member.MemberModifyDto;
+import com.borrow_mine.BorrowMine.dto.member.*;
 import com.borrow_mine.BorrowMine.jwt.JwtTokenProvider;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
+import com.borrow_mine.BorrowMine.service.ChangePasswordService;
 import com.borrow_mine.BorrowMine.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +30,7 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ChangePasswordService changePasswordService;
 
     //    TODO ResponseEntity 그대로 던져도 될까?
     @PutMapping("/join")
@@ -91,6 +89,20 @@ public class MemberController {
     public ResponseEntity<Object> removeDeny(@PathVariable Long id, HttpServletRequest request) {
         String nickname = (String) request.getAttribute("nickname");
         memberService.removeDeny(id, nickname);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/password/validate")
+    public ResponseEntity<String> validateMember(@Valid @RequestBody ValidateMemberDto validateMemberDto) {
+        String nickname = memberService.validateChangePassword(validateMemberDto);
+        String uuid = changePasswordService.save(nickname);
+        return ResponseEntity.ok(uuid);
+    }
+
+    @PostMapping("/password/change")
+    public ResponseEntity<Object> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto) {
+        Optional<String> memberNickname = changePasswordService.getMemberNickname(changePasswordDto.getUuid());
+        memberService.changePassword(memberNickname.orElseThrow(), changePasswordDto.getPassword());
         return ResponseEntity.ok().build();
     }
 }

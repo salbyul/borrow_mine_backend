@@ -8,6 +8,7 @@ import com.borrow_mine.BorrowMine.dto.PopularProductDto;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
+import com.borrow_mine.BorrowMine.dto.request.RequestAcceptDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestDto;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
@@ -101,6 +102,10 @@ public class BorrowPostPresentationService {
 
     public List<RequestDto> getReceivedRequestDtoList(Member member) {
         return requestRepository.getReceivedRequestDtoListByMember(member);
+    }
+
+    public List<RequestAcceptDto> getAcceptedDto(Member member) {
+        return requestRepository.getAcceptedRequest(member);
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {

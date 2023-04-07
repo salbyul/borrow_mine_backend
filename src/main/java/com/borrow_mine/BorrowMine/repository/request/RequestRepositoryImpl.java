@@ -1,7 +1,8 @@
 package com.borrow_mine.BorrowMine.repository.request;
 
 import com.borrow_mine.BorrowMine.domain.member.Member;
-import com.borrow_mine.BorrowMine.domain.member.QMember;
+import com.borrow_mine.BorrowMine.domain.request.State;
+import com.borrow_mine.BorrowMine.dto.request.RequestAcceptDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -34,6 +35,16 @@ public class RequestRepositoryImpl implements RequestRepositoryCustom{
                 .from(request)
                 .leftJoin(request.borrowPost, borrowPost)
                 .where(request.borrowPost.member.eq(member))
+                .fetch();
+    }
+
+    @Override
+    public List<RequestAcceptDto> getAcceptedRequest(Member member) {
+        return queryFactory
+                .select(Projections.fields(RequestAcceptDto.class, request.borrowPost.product, request.borrowPost.price, request.borrowPost.period, request.borrowPost.member.nickname.as("memberNickname"), request.borrowPost.member.id.as("memberId"), request.borrowPost.id.as("borrowPostId")))
+                .from(request)
+                .leftJoin(request.borrowPost, borrowPost)
+                .where(request.member.eq(member).and(request.state.eq(State.ACCEPT)))
                 .fetch();
     }
 }

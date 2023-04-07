@@ -62,9 +62,9 @@ public class Member {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
-    public Member(MemberJoinDto memberJoinDto) {
+    public Member(MemberJoinDto memberJoinDto, String password) {
         this.email = memberJoinDto.getEmail();
-        this.password = memberJoinDto.getPassword();
+        this.password = password;
         this.nickname = memberJoinDto.getNickname();
         this.address = memberJoinDto.getAddress();
         this.createdDate = LocalDateTime.now();
@@ -75,5 +75,9 @@ public class Member {
     public void modify(MemberModifyDto memberModifyDto) {
         this.nickname = memberModifyDto.getNickname();
         this.address = memberModifyDto.getAddress();
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
     }
 }

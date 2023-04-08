@@ -1,6 +1,5 @@
 package com.borrow_mine.BorrowMine;
 
-import com.borrow_mine.BorrowMine.jwt.JwtTokenProvider;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,11 +18,6 @@ public class BorrowMineApplication {
 	@Bean
 	public JPAQueryFactory jpaQueryFactory(EntityManager em) {
 		return new JPAQueryFactory(em);
-	}
-
-	@Bean
-	public JwtTokenProvider jwtTokenProvider() {
-		return new JwtTokenProvider();
 	}
 
 	@Bean

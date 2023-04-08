@@ -2,6 +2,7 @@ package com.borrow_mine.BorrowMine.service;
 
 import com.borrow_mine.BorrowMine.domain.Address;
 import com.borrow_mine.BorrowMine.domain.Deny;
+import com.borrow_mine.BorrowMine.domain.Token;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.deny.DenyDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
@@ -11,6 +12,7 @@ import com.borrow_mine.BorrowMine.dto.member.ValidateMemberDto;
 import com.borrow_mine.BorrowMine.exception.DenyException;
 import com.borrow_mine.BorrowMine.repository.DenyRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
+import com.borrow_mine.BorrowMine.repository.TokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final TokenRepository tokenRepository;
     private final DenyRepository denyRepository;
     private final EncryptService encryptService;
 
@@ -50,6 +53,11 @@ public class MemberService {
             throw new NoSuchElementException();
         }
         return member;
+    }
+
+    public void saveToken(String accessToken, String refreshToken) {
+        Token token = new Token(accessToken, refreshToken);
+        tokenRepository.save(token);
     }
 
     @Transactional

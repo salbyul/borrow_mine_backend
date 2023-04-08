@@ -25,14 +25,14 @@ public class JwtTokenFilter implements Filter {
         } else if (req.getRequestURI().startsWith("/chat/room/")) {
             String[] split = req.getQueryString().split("=");
             String token = split[1];
-            jwtTokenProvider.validateToken(token);
+            jwtTokenProvider.validateToken(token, req);
             chain.doFilter(request, response);
         } else {
             String authorization = req.getHeader("Authorization");
             if (authorization == null) throw new JwtException("JWT TOKEN EXCEPTION");
 
-            String token = authorization.substring(7);
-            String nickname = jwtTokenProvider.validateToken(token);
+            String accessToken = authorization.substring(7);
+            String nickname = jwtTokenProvider.validateToken(accessToken, req);
             req.setAttribute("nickname", nickname);
             chain.doFilter(request, response);
         }

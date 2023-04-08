@@ -38,6 +38,9 @@ public class MemberControllerAdvice {
         } else if (e.getMessage().equals("Member Password Error")) {
             log.error("Member Password Error");
             return new ErrorResult("Member Password Error", 444);
+        } else if (e.getMessage().equals("Member Password Duplicate")) {
+            log.error("Member Password Duplicate");
+            return new ErrorResult("Member Password Duplicate", 455);
         }
         return null;
     }

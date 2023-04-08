@@ -110,6 +110,17 @@ public class MemberService {
         member.changePassword(encryptService.encrypt(password));
     }
 
+    @Transactional
+    public void changePassword(String nickname, String currentPassword, String password) {
+        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
+        Member member = findMember.orElseThrow();
+        if (!encryptService.isMatch(currentPassword, member.getPassword()))
+            throw new IllegalStateException("Member Password Error");
+        if (encryptService.isMatch(password, member.getPassword()))
+            throw new IllegalStateException("Member Password Duplicate");
+        member.changePassword(encryptService.encrypt(password));
+    }
+
     private void validateDuplicateMember(MemberJoinDto memberJoinDto) {
         validateEmail(memberJoinDto.getEmail());
         validateNickname(memberJoinDto.getNickname());

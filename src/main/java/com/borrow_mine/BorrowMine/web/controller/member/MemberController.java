@@ -14,7 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -41,14 +43,21 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody MemberLoginDto memberLoginDto) {
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody MemberLoginDto memberLoginDto, HttpServletResponse response) {
         Member member = memberService.login(memberLoginDto);
-        String token = jwtTokenProvider.createToken(member.getNickname());
+        String accessToken = jwtTokenProvider.createAccessToken(member.getNickname());
+        String refreshToken = jwtTokenProvider.createRefreshToken(member.getNickname());
 
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("token", token);
+        responseBody.put("accessToken", accessToken);
         responseBody.put("nickname", member.getNickname());
-        return ResponseEntity.ok(responseBody);
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setMaxAge(60 * 30 * 1000);
+        refreshTokenCookie.setDomain("localhost");
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     @PutMapping("/deny/{nickname}")
@@ -92,17 +101,29 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/password/validate")
+
+    @PostMapping("/password/forget/validate")
     public ResponseEntity<String> validateMember(@Valid @RequestBody ValidateMemberDto validateMemberDto) {
         String nickname = memberService.validateChangePassword(validateMemberDto);
         String uuid = changePasswordService.save(nickname);
         return ResponseEntity.ok(uuid);
     }
 
-    @PostMapping("/password/change")
+    @PostMapping("/password/forget/change")
     public ResponseEntity<Object> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto) {
         Optional<String> memberNickname = changePasswordService.getMemberNickname(changePasswordDto.getUuid());
         memberService.changePassword(memberNickname.orElseThrow(), changePasswordDto.getPassword());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * ㄷㅔ이터 넘어오는 것 까지 확인 했음
+     * 이제 로직 처리하면 됨
+     */
+    @PostMapping("/password/change")
+    public ResponseEntity<Object> changePassword(@Valid @RequestBody PasswordDto passwordDto, HttpServletRequest request) {
+        String nickname = (String) request.getAttribute("nickname");
+        memberService.changePassword(nickname, passwordDto.getCurrentPassword(), passwordDto.getPassword());
         return ResponseEntity.ok().build();
     }
 }

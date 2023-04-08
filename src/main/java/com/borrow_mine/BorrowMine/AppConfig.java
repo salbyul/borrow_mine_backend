@@ -22,6 +22,7 @@ public class AppConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("*")
+                .allowCredentials(true)
                 .maxAge(3600);
     }
 
@@ -39,6 +40,7 @@ public class AppConfig implements WebMvcConfigurer {
 //                Member
                 "/member/deny/*",
                 "/member/info/*",
+                "/member/password/change",
 //                Chat
                 "/chat/*");
         return filterRegistrationBean;

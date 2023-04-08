@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
@@ -16,17 +15,25 @@ import java.util.Map;
 @Slf4j
 public class JwtTokenProvider {
 
-    @Value("${jwt.token.secret-key}")
-    private String secretKey;
+    @Value("${jwt.token.access.secret-key}")
+    private String AccessSecretKey;
+    @Value("${jwt.token.refresh.secret-key}")
+    private String refreshSecretKey;
+
 
     private SignatureAlgorithm algorithm = SignatureAlgorithm.HS256;
 
-    private Key createKey() {
-        byte[] secretKeyBytes = DatatypeConverter.parseBase64Binary(secretKey);
+    private Key createAccessKey() {
+        byte[] secretKeyBytes = DatatypeConverter.parseBase64Binary(AccessSecretKey);
         return new SecretKeySpec(secretKeyBytes, algorithm.getJcaName());
     }
 
-    public String createToken(String nickname) {
+    private Key createRefreshKey() {
+        byte[] secretKeyBytes = DatatypeConverter.parseBase64Binary(refreshSecretKey);
+        return new SecretKeySpec(secretKeyBytes, algorithm.getJcaName());
+    }
+
+    public String createAccessToken(String nickname) {
         Map<String, Object> headerMap = new HashMap<>();
         headerMap.put("typ", "JWT");
         headerMap.put("alg", "HS256");
@@ -35,14 +42,14 @@ public class JwtTokenProvider {
         claims.put("nickname", nickname);
 
         Date expireTime = new Date();
-//        TODO 시간 바꿔야함!!
-        expireTime.setTime(expireTime.getTime() + 6000 * 30 * 1000);
+//        30분 토큰
+        expireTime.setTime(expireTime.getTime() + 30 * 60 * 1000);
 
         JwtBuilder builder = Jwts.builder()
                 .setHeader(headerMap)
                 .setClaims(claims)
                 .setExpiration(expireTime)
-                .signWith(createKey(), algorithm);
+                .signWith(createAccessKey(), algorithm);
 
         String result = builder.compact();
         return result;
@@ -56,7 +63,7 @@ public class JwtTokenProvider {
 //        String token = authorization.substring(7);
         try {
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(AccessSecretKey))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -71,5 +78,27 @@ public class JwtTokenProvider {
             log.error("BAD TOKEN");
         }
         return null;
+    }
+
+    public String createRefreshToken(String nickname) {
+        Map<String, Object> headerMap = new HashMap<>();
+        headerMap.put("typ", "JWT");
+        headerMap.put("alg", "HS256");
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("nickname", nickname);
+
+        Date expireTime = new Date();
+//        1시간 토큰
+        expireTime.setTime(expireTime.getTime() + 60 * 60 * 1000);
+
+        JwtBuilder builder = Jwts.builder()
+                .setHeader(headerMap)
+                .setClaims(claims)
+                .setExpiration(expireTime)
+                .signWith(createRefreshKey(), algorithm);
+
+        String result = builder.compact();
+        return result;
     }
 }

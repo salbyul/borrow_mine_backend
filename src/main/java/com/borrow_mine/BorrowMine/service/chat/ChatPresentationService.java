@@ -4,6 +4,7 @@ import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.chat.Chat;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.chat.ChatDto;
+import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.chat.ChatRepository;
 import com.borrow_mine.BorrowMine.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,19 @@ import java.util.Optional;
 @Transactional
 public class ChatPresentationService {
 
+    private final MemberRepository memberRepository;
     private final ChatRepository chatRepository;
     private final MemberService memberService;
 
-    public List<ChatDto> getChatDtoList(Member from, Member to) {
-        Optional<Deny> deny = memberService.findDeny(from, to);
+    public List<ChatDto> getChatDtoList(String fromMemberNickname, String toMemberNickname) {
+        Optional<Member> optionalFromMember = memberRepository.findMemberByNickname(fromMemberNickname);
+        Optional<Member> optionalToMember = memberRepository.findMemberByNickname(toMemberNickname);
+        Member fromMember = optionalFromMember.orElseThrow();
+        Member toMember = optionalToMember.orElseThrow();
+
+        Optional<Deny> deny = memberService.findDeny(fromMember, toMember);
         if (deny.isPresent()) {
-            List<Chat> findChatList = chatRepository.findChatListByFromAndToBeforeTime(from, to, deny.get().getCreatedDate());
+            List<Chat> findChatList = chatRepository.findChatListByFromAndToBeforeTime(fromMember, toMember, deny.get().getCreatedDate());
             List<ChatDto> result = new ArrayList<>();
 
             for (Chat chat : findChatList) {
@@ -34,7 +41,7 @@ public class ChatPresentationService {
             }
             return result;
         }
-        List<Chat> findChatList = chatRepository.findChatListByFromAndToBeforeTime(from, to, LocalDateTime.now());
+        List<Chat> findChatList = chatRepository.findChatListByFromAndToBeforeTime(fromMember, toMember, LocalDateTime.now());
         List<ChatDto> result = new ArrayList<>();
 
         for (Chat chat : findChatList) {

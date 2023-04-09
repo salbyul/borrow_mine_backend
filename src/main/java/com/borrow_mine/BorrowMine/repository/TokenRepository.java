@@ -9,6 +9,10 @@ import java.util.Optional;
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
-    @Query("select t from Token t where t.refreshToken = :refreshToken")
-    Optional<Token> findTokenByRefreshToken(@Param("refreshToken") String refreshToken);
+    Optional<Token> findTokenByRefreshToken(String refreshToken);
+
+    Optional<Token> findTokenByNickname(String nickname);
+
+    @Query("select t.nickname from Token t where t.refreshToken = :refreshToken")
+    Optional<String> findNicknameByRefreshToken(@Param("refreshToken") String refreshToken);
 }

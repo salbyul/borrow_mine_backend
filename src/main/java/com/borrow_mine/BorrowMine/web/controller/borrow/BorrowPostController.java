@@ -1,6 +1,5 @@
 package com.borrow_mine.BorrowMine.web.controller.borrow;
 
-import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.PopularProductDto;
 import com.borrow_mine.BorrowMine.dto.PopularProductResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
@@ -10,7 +9,6 @@ import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestAcceptDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestResponse;
-import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.*;
 import com.borrow_mine.BorrowMine.service.borrow.BorrowPostPresentationService;
 import com.borrow_mine.BorrowMine.service.borrow.BorrowPostService;
@@ -19,19 +17,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/borrow")
 public class BorrowPostController {
 
-    private final MemberRepository memberRepository;
     private final BorrowPostPresentationService borrowPostPresentationService;
     private final BorrowPostService borrowPostService;
     private final ImageService imageService;
@@ -60,26 +55,22 @@ public class BorrowPostController {
     }
 
     @PutMapping("/report/{id}")
-    public ResponseEntity<Object> report(@PathVariable("id") Long borrowPostId, HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        reportService.reportBorrowPost(borrowPostId, findMember.orElseThrow());
+    public ResponseEntity<Object> report(@PathVariable("id") Long borrowPostId, @CookieValue String nickname) {
+        reportService.reportBorrowPost(borrowPostId, nickname);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/create")
-    public ResponseEntity<Map<String, Object>> create(@RequestPart BorrowPostSaveDto borrowPostSaveDto, @RequestPart List<MultipartFile> imageList, HttpServletRequest request) throws IOException {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        Long id = borrowPostService.saveBorrowPost(borrowPostSaveDto, imageList, findMember.orElseThrow());
+    public ResponseEntity<Map<String, Object>> create(@RequestPart BorrowPostSaveDto borrowPostSaveDto, @RequestPart List<MultipartFile> imageList, @CookieValue String nickname) throws IOException {
+        Long id = borrowPostService.saveBorrowPost(borrowPostSaveDto, imageList, nickname);
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("id", id);
         return ResponseEntity.ok(responseMap);
     }
 
     @GetMapping("/product/{name}")
-    public ResponseEntity<Map<String, Object>> recommendProductName(@PathVariable String name) {
-        List<String> productNames = borrowPostService.recommendProductName(name);
+    public ResponseEntity<Map<String, Object>> recommendProductName(@PathVariable("name") String input) {
+        List<String> productNames = borrowPostService.recommendProductName(input);
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("productNames", productNames);
         return ResponseEntity.ok(responseMap);
@@ -104,41 +95,32 @@ public class BorrowPostController {
     }
 
     @GetMapping("/wrote")
-    public BorrowListResponse wroteList(HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        return borrowPostPresentationService.getWroteList(findMember.orElseThrow());
+    public BorrowListResponse wroteList(@CookieValue String nickname) {
+        return borrowPostPresentationService.getWroteList(nickname);
     }
 
+//    TODO 날짜 지난 게시물에 요청 불가능하게 해야함 && 상태에 따라서도 요청 불가능 해야함
     @PutMapping("/request")
-    public ResponseEntity<Object> borrowRequest(HttpServletRequest request, @RequestParam Long id) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        borrowPostService.requestBorrow(findMember.orElseThrow(), id);
+    public ResponseEntity<Object> borrowRequest(@CookieValue String nickname, @RequestParam Long id) {
+        borrowPostService.requestBorrow(nickname, id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/request/sent")
-    public RequestResponse getSentRequest(HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        List<RequestDto> requestDtoList = borrowPostPresentationService.getSentRequestDtoList(findMember.orElseThrow());
+    public RequestResponse getSentRequest(@CookieValue String nickname) {
+        List<RequestDto> requestDtoList = borrowPostPresentationService.getSentRequestDtoList(nickname);
         return RequestResponse.assembleRequestResponse(requestDtoList);
     }
 
     @GetMapping("/request/received")
-    public RequestResponse getReceivedRequest(HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        List<RequestDto> receivedRequestDtoList = borrowPostPresentationService.getReceivedRequestDtoList(findMember.orElseThrow());
+    public RequestResponse getReceivedRequest(@CookieValue String nickname) {
+        List<RequestDto> receivedRequestDtoList = borrowPostPresentationService.getReceivedRequestDtoList(nickname);
         return RequestResponse.assembleRequestResponse(receivedRequestDtoList);
     }
 
     @GetMapping("/request/accept")
-    public RequestResponse acceptedRequest(HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        List<RequestAcceptDto> acceptDtoList = borrowPostPresentationService.getAcceptedDto(findMember.orElseThrow());
+    public RequestResponse acceptedRequest(@CookieValue String nickname) {
+        List<RequestAcceptDto> acceptDtoList = borrowPostPresentationService.getAcceptedDto(nickname);
         return RequestResponse.assembleRequestAcceptedResponse(acceptDtoList);
     }
 

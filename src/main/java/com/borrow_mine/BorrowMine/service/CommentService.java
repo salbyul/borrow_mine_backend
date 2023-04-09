@@ -26,9 +26,10 @@ public class CommentService {
     private final BorrowPostRepository borrowPostRepository;
 
     @Transactional
-    public void saveComment(CommentSaveDto commentSaveDto, Member member) {
+    public void saveComment(CommentSaveDto commentSaveDto, String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findById(commentSaveDto.getBorrowPostId());
-        commentRepository.save(new Comment(commentSaveDto, findBorrowPost.orElseThrow(), member));
+        commentRepository.save(new Comment(commentSaveDto, findBorrowPost.orElseThrow(), optionalMember.orElseThrow()));
     }
 
 //    TODO : 페이징?

@@ -26,19 +26,23 @@ public class ReportService {
     private final BorrowPostRepository borrowPostRepository;
 
     @Transactional
-    public void reportBorrowPost(Long borrowPostId, Member member) {
+    public void reportBorrowPost(Long borrowPostId, String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findById(borrowPostId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
-        validateDuplicateReportBorrowPost(borrowPost, member);
-        reportRepository.save(new Report(borrowPost, member));
+        validateDuplicateReportBorrowPost(borrowPost, findMember);
+        reportRepository.save(new Report(borrowPost, findMember));
     }
 
     @Transactional
-    public void reportComment(Long commentId, Member member) {
+    public void reportComment(Long commentId, String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
         Optional<Comment> findComment = commentRepository.findById(commentId);
         Comment comment = findComment.orElseThrow();
-        validateDuplicateReportComment(comment, member);
-        reportRepository.save(new Report(comment, member));
+        validateDuplicateReportComment(comment, findMember);
+        reportRepository.save(new Report(comment, findMember));
     }
 
     private void validateDuplicateReportBorrowPost(BorrowPost borrowPost, Member member) {
@@ -48,7 +52,12 @@ public class ReportService {
     }
 
     private void validateDuplicateReportComment(Comment comment, Member member) {
-        if (reportRepository.findByMemberAndComment(comment, member).isPresent()) {
+        Member findMember = comment.getMember();
+        if (findMember == member) {
+            throw new DuplicateRequestException("REPORT ERROR");
+        }
+        Optional<Report> optionalReport = reportRepository.findByMemberAndComment(comment, member);
+        if (optionalReport.isPresent()) {
             throw new DuplicateRequestException("DUPLICATE REPORT BY COMMENT");
         }
     }

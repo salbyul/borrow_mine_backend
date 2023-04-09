@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.*;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
@@ -28,12 +30,7 @@ public class JwtTokenFilter implements Filter {
             jwtTokenProvider.validateToken(token, req);
             chain.doFilter(request, response);
         } else {
-            String authorization = req.getHeader("Authorization");
-            if (authorization == null) throw new JwtException("JWT TOKEN EXCEPTION");
-
-            String accessToken = authorization.substring(7);
-            String nickname = jwtTokenProvider.validateToken(accessToken, req);
-            req.setAttribute("nickname", nickname);
+            jwtTokenProvider.validateToken(req, (HttpServletResponse) response);
             chain.doFilter(request, response);
         }
     }

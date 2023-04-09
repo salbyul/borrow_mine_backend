@@ -9,6 +9,7 @@ import com.borrow_mine.BorrowMine.domain.request.State;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowDetail;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSaveDto;
 import com.borrow_mine.BorrowMine.repository.DenyRepository;
+import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.request.RequestRepository;
 import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
@@ -30,6 +31,7 @@ import java.util.Optional;
 public class BorrowPostService {
 
     private final BorrowPostRepository borrowPostRepository;
+    private final MemberRepository memberRepository;
     private final DenyRepository denyRepository;
     private final RequestRepository requestRepository;
     private final StatisticRepository statisticRepository;
@@ -43,8 +45,10 @@ public class BorrowPostService {
     }
 
     @Transactional
-    public Long saveBorrowPost(BorrowPostSaveDto borrowPostSaveDto, List<MultipartFile> imageList, Member member) throws IOException {
-        BorrowPost borrowPost = new BorrowPost(borrowPostSaveDto, member);
+    public Long saveBorrowPost(BorrowPostSaveDto borrowPostSaveDto, List<MultipartFile> imageList, String nickname) throws IOException {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
+        BorrowPost borrowPost = new BorrowPost(borrowPostSaveDto, findMember);
         borrowPostRepository.save(borrowPost);
         imageService.saveImage(imageList, borrowPost);
         String product = borrowPost.getProduct();
@@ -61,19 +65,21 @@ public class BorrowPostService {
     }
 
     @Transactional
-    public void requestBorrow(Member member, Long borrowId) {
+    public void requestBorrow(String nickname, Long borrowId) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdWithMember(borrowId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
-        Optional<Deny> findDeny = denyRepository.findByFromAndTo(borrowPost.getMember(), member);
+        Optional<Deny> findDeny = denyRepository.findByFromAndTo(borrowPost.getMember(), findMember);
         if (findDeny.isPresent()) {
             throw new IllegalStateException("Deny Error");
         }
-        if (borrowPost.getMember() == member) {
+        if (borrowPost.getMember() == findMember) {
             throw new IllegalStateException("Request Error");
         }
-        List<Request> findRequestList = requestRepository.findRequestByBorrowPostAndMember(borrowPost, member);
+        List<Request> findRequestList = requestRepository.findRequestByBorrowPostAndMember(borrowPost, findMember);
         if (findRequestList.isEmpty()) {
-            requestRepository.save(new Request(null, State.WAIT, borrowPost, member, LocalDateTime.now()));
+            requestRepository.save(new Request(null, State.WAIT, borrowPost, findMember, LocalDateTime.now()));
         } else {
             throw new DuplicateRequestException("중복");
         }

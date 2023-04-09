@@ -54,7 +54,7 @@ public class WebSocketService {
         Optional<Member> to = memberRepository.findMemberByNickname(dto.getTarget());
         Member fromMember = from.orElseThrow();
         Member toMember = to.orElseThrow();
-        chatService.saveChatMessage(fromMember, toMember, dto.getMessage());
+        chatService.saveChatMessage(dto.getFrom(), dto.getTarget(), dto.getMessage());
 
         if (clients.containsKey(dto.getTarget())) {
             Optional<Deny> denyOne = memberService.findDeny(fromMember, toMember);

@@ -26,13 +26,12 @@ public class AppConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    //    TODO mapping 설정
     @Bean
     public FilterRegistrationBean<Filter> jwtTokenFilter() {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new JwtTokenFilter(jwtTokenProvider));
         filterRegistrationBean.setOrder(1);
-        filterRegistrationBean.addUrlPatterns("/header",
+        filterRegistrationBean.addUrlPatterns(
 //                Comment
                 "/comment/save", "/comment/report/*",
 //                Borrow

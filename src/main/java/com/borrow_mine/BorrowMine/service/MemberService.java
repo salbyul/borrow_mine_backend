@@ -2,7 +2,6 @@ package com.borrow_mine.BorrowMine.service;
 
 import com.borrow_mine.BorrowMine.domain.Address;
 import com.borrow_mine.BorrowMine.domain.Deny;
-import com.borrow_mine.BorrowMine.domain.Token;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.deny.DenyDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberJoinDto;
@@ -12,13 +11,11 @@ import com.borrow_mine.BorrowMine.dto.member.ValidateMemberDto;
 import com.borrow_mine.BorrowMine.exception.DenyException;
 import com.borrow_mine.BorrowMine.repository.DenyRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
-import com.borrow_mine.BorrowMine.repository.TokenRepository;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,7 +29,6 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final TokenRepository tokenRepository;
     private final DenyRepository denyRepository;
     private final EncryptService encryptService;
 
@@ -55,30 +51,33 @@ public class MemberService {
         return member;
     }
 
-    public void saveToken(String accessToken, String refreshToken) {
-        Token token = new Token(accessToken, refreshToken);
-        tokenRepository.save(token);
-    }
-
     @Transactional
-    public void deny(Member from, Member to) {
-        Optional<Deny> findDeny = denyRepository.findByFromAndTo(from, to);
+    public void deny(String fromMemberNickname, String toMemberNickname) {
+        Optional<Member> optionalFromMember = memberRepository.findMemberByNickname(fromMemberNickname);
+        Optional<Member> optionalToMember = memberRepository.findMemberByNickname(toMemberNickname);
+
+        Member fromMember = optionalFromMember.orElseThrow();
+        Member toMember = optionalToMember.orElseThrow();
+
+        Optional<Deny> findDeny = denyRepository.findByFromAndTo(fromMember, toMember);
+
         findDeny.ifPresent((d) -> {
             throw new DuplicateRequestException("중복");
         });
-        denyRepository.save(Deny.assembleDeny(from, to));
+        denyRepository.save(Deny.assembleDeny(fromMember, toMember));
     }
 
-    public List<DenyDto> getDenyList(Member member) {
-        List<Deny> denyList = denyRepository.findDenyByFrom(member);
+    public List<DenyDto> getDenyList(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        List<Deny> denyList = denyRepository.findDenyByFrom(optionalMember.orElseThrow());
         return denyList.stream()
                 .map(d -> new DenyDto(d.getTo().getNickname(), d.getId()))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void removeDeny(Long id, String from) {
-        Optional<Deny> findDeny = denyRepository.findOneById(id);
+    public void removeDeny(Long denyId, String from) {
+        Optional<Deny> findDeny = denyRepository.findOneById(denyId);
         Deny deny = findDeny.orElseThrow();
         if (!deny.getFrom().getNickname().equals(from))
             throw new DenyException(DenyException.forbiddenAccess, DenyException.forbiddenAccessCode);

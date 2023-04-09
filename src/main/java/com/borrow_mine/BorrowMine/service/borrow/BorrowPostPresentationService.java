@@ -10,6 +10,7 @@ import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestAcceptDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestDto;
+import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
 import com.borrow_mine.BorrowMine.repository.request.RequestRepository;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class BorrowPostPresentationService {
 
     private final BorrowPostRepository borrowPostRepository;
+    private final MemberRepository memberRepository;
     private final RequestRepository requestRepository;
     private final StatisticRepository statisticRepository;
     private final ImageService imageService;
@@ -55,8 +57,10 @@ public class BorrowPostPresentationService {
         return BorrowListResponse.assembleBorrowSmallList(borrowPostSmalls, offset);
     }
 
-    public BorrowListResponse getWroteList(Member member) {
-        List<BorrowPostSmall> borrowPostSmallList = borrowPostRepository.getBorrowPostSmallByMember(member);
+    public BorrowListResponse getWroteList(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
+        List<BorrowPostSmall> borrowPostSmallList = borrowPostRepository.getBorrowPostSmallByMember(findMember);
         List<Long> ids = borrowPostSmallList.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
         List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
 
@@ -96,16 +100,22 @@ public class BorrowPostPresentationService {
         return result;
     }
 
-    public List<RequestDto> getSentRequestDtoList(Member member) {
-        return requestRepository.getSentRequestDtoListByMember(member);
+    public List<RequestDto> getSentRequestDtoList(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
+        return requestRepository.getSentRequestDtoListByMember(findMember);
     }
 
-    public List<RequestDto> getReceivedRequestDtoList(Member member) {
-        return requestRepository.getReceivedRequestDtoListByMember(member);
+    public List<RequestDto> getReceivedRequestDtoList(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
+        return requestRepository.getReceivedRequestDtoListByMember(findMember);
     }
 
-    public List<RequestAcceptDto> getAcceptedDto(Member member) {
-        return requestRepository.getAcceptedRequest(member);
+    public List<RequestAcceptDto> getAcceptedDto(String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
+        return requestRepository.getAcceptedRequest(findMember);
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {

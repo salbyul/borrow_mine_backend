@@ -3,12 +3,14 @@ package com.borrow_mine.BorrowMine.domain;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.comment.Comment;
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @Table(name = "report")
 public class Report {

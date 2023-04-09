@@ -22,41 +22,30 @@ public class ChatController {
 
     private final ChatService chatService;
     private final ChatPresentationService chatPresentationService;
-    private final MemberRepository memberRepository;
 
     @GetMapping("/chat-room")
-    public ChatRoomResponse getChatRooms(HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
-
-        List<String> chatRooms = chatService.getChatRooms(memberRepository.findMemberByNickname(nickname).orElseThrow());
+    public ChatRoomResponse getChatRooms(@CookieValue String nickname) {
+        List<String> chatRooms = chatService.getChatRooms(nickname);
 
         return ChatRoomResponse.assembleChatResponse(chatRooms);
     }
 
     @PutMapping("/chat-room/create")
-    public ResponseEntity<Object> createChatRoom(HttpServletRequest request, @RequestParam("to") String target) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findFromMember = memberRepository.findMemberByNickname(nickname);
-        Optional<Member> findToMember = memberRepository.findMemberByNickname(target);
-        chatService.createChatRoom(findFromMember.orElseThrow(), findToMember.orElseThrow());
+    public ResponseEntity<Object> createChatRoom(@CookieValue String nickname, @RequestParam("to") String targetMemberNickname) {
+        chatService.createChatRoom(nickname, targetMemberNickname);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/log")
-    public ChatResponse chattingHistory(HttpServletRequest request, @RequestParam("to") String target) {
-        String nickname = (String) request.getAttribute("nickname");
-        Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        Optional<Member> targetMember = memberRepository.findMemberByNickname(target);
+    public ChatResponse chattingHistory(@CookieValue String nickname, @RequestParam("to") String targetMemberNickname) {
 
-        List<ChatDto> chatDtoList = chatPresentationService.getChatDtoList(findMember.orElseThrow(), targetMember.orElseThrow());
+        List<ChatDto> chatDtoList = chatPresentationService.getChatDtoList(nickname, targetMemberNickname);
         return ChatResponse.assembleChatResponse(chatDtoList);
     }
 
     @DeleteMapping("/chat-room/delete/{nickname}")
-    public ResponseEntity<Object> removeChatRoom(HttpServletRequest request, @PathVariable String nickname) {
-        Optional<Member> findMember = memberRepository.findMemberByNickname((String) request.getAttribute("nickname"));
-        Optional<Member> target = memberRepository.findMemberByNickname(nickname);
-        chatService.removeChatRoom(findMember.orElseThrow(), target.orElseThrow());
+    public ResponseEntity<Object> removeChatRoom(@CookieValue String nickname, @PathVariable("nickname") String targetMemberNickname) {
+        chatService.removeChatRoom(nickname, targetMemberNickname);
         return ResponseEntity.ok().build();
     }
 }

@@ -74,4 +74,8 @@ public class BorrowPost {
         this.createdDate = LocalDateTime.now();
     }
 
+    public void updateState(State state) {
+        this.state = state;
+    }
+
 }

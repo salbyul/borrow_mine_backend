@@ -3,6 +3,7 @@ package com.borrow_mine.BorrowMine.service.borrow;
 import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.borrow.Period;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.domain.request.Request;
 import com.borrow_mine.BorrowMine.domain.request.State;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,10 +39,11 @@ public class BorrowPostService {
     private final StatisticRepository statisticRepository;
     private final ImageService imageService;
 
+    @Transactional
     public BorrowDetail getDetail(Long borrowPostId) {
-
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdFetchMember(borrowPostId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
+        updateState(borrowPost);
         return new BorrowDetail(borrowPost);
     }
 
@@ -70,12 +73,10 @@ public class BorrowPostService {
         Member findMember = optionalMember.orElseThrow();
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdWithMember(borrowId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
+        validateRequestBorrowPost(borrowPost, findMember);
         Optional<Deny> findDeny = denyRepository.findByFromAndTo(borrowPost.getMember(), findMember);
         if (findDeny.isPresent()) {
             throw new IllegalStateException("Deny Error");
-        }
-        if (borrowPost.getMember() == findMember) {
-            throw new IllegalStateException("Request Error");
         }
         List<Request> findRequestList = requestRepository.findRequestByBorrowPostAndMember(borrowPost, findMember);
         if (findRequestList.isEmpty()) {
@@ -87,16 +88,18 @@ public class BorrowPostService {
 
     @Transactional
     public void acceptRequestState(Long requestId) {
-        Optional<Request> findRequest = requestRepository.findById(requestId);
+        Optional<Request> findRequest = requestRepository.findRequestById(requestId);
         Request request = findRequest.orElseThrow();
         if (request.getState().equals(State.WAIT)) {
             request.changeState(State.ACCEPT);
         }
+        BorrowPost borrowPost = request.getBorrowPost();
+        borrowPost.updateState(com.borrow_mine.BorrowMine.domain.borrow.State.DONE);
     }
 
     @Transactional
     public void refuseRequestState(Long requestId) {
-        Optional<Request> findRequest = requestRepository.findById(requestId);
+        Optional<Request> findRequest = requestRepository.findRequestById(requestId);
         Request request = findRequest.orElseThrow();
         if (request.getState().equals(State.WAIT)) {
             request.changeState(State.REFUSE);
@@ -105,5 +108,34 @@ public class BorrowPostService {
 
     public List<String> recommendProductName(String name) {
         return borrowPostRepository.getProductName(name);
+    }
+
+    private void validateRequestBorrowPost(BorrowPost borrowPost, Member member) {
+        if (borrowPost.getMember() == member) {
+            throw new IllegalStateException("Request Member Error");
+        }
+        com.borrow_mine.BorrowMine.domain.borrow.State state = borrowPost.getState();
+        if (state != com.borrow_mine.BorrowMine.domain.borrow.State.ACTIVATE) {
+            throw new IllegalStateException("Request State Error");
+        }
+        Period period = borrowPost.getPeriod();
+        if (period.getStartDate().isBefore(LocalDate.now())) {
+            throw new IllegalStateException("Request Period Error");
+        }
+    }
+
+    private void updateState(BorrowPost borrowPost) {
+
+        if (!(borrowPost.getState() == com.borrow_mine.BorrowMine.domain.borrow.State.ACTIVATE)) return;
+
+        if (borrowPost.getPeriod().getStartDate().isBefore(LocalDate.now())) {
+            borrowPost.updateState(com.borrow_mine.BorrowMine.domain.borrow.State.DONE);
+            return;
+        }
+
+        Integer count = requestRepository.findAcceptRequestByBorrowPost(borrowPost);
+        if (count != 0) {
+            borrowPost.updateState(com.borrow_mine.BorrowMine.domain.borrow.State.DONE);
+        }
     }
 }

@@ -21,8 +21,12 @@ public class BorrowPostControllerAdvice {
     public ErrorResult illegalState(IllegalStateException e) {
         if (e.getMessage().equals("Deny Error")) {
             return new ErrorResult("Deny Error", 333);
-        } else if (e.getMessage().equals("Request Error")) {
+        } else if (e.getMessage().equals("Request Member Error")) {
             return new ErrorResult("Error", 222);
+        } else if (e.getMessage().equals("Request State Error")) {
+            return new ErrorResult(e.getMessage(), 444);
+        } else if (e.getMessage().equals("Request Period Error")) {
+            return new ErrorResult(e.getMessage(), 555);
         }
         return null;
     }

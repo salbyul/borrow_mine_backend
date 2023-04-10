@@ -43,6 +43,9 @@ public class BorrowPostService {
     public BorrowDetail getDetail(Long borrowPostId) {
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdFetchMember(borrowPostId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
+        if (borrowPost.getState() == com.borrow_mine.BorrowMine.domain.borrow.State.DELETE) {
+            throw new IllegalStateException("BORROW_POST DELETE ERROR");
+        }
         updateState(borrowPost);
         return new BorrowDetail(borrowPost);
     }
@@ -71,7 +74,7 @@ public class BorrowPostService {
     public void requestBorrow(String nickname, Long borrowId) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
         Member findMember = optionalMember.orElseThrow();
-        Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdWithMember(borrowId);
+        Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdFetchMember(borrowId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow();
         validateRequestBorrowPost(borrowPost, findMember);
         Optional<Deny> findDeny = denyRepository.findByFromAndTo(borrowPost.getMember(), findMember);
@@ -110,6 +113,20 @@ public class BorrowPostService {
         return borrowPostRepository.getProductName(name);
     }
 
+    @Transactional
+    public void deleteBorrowPost(Long borrowPostId, String nickname) {
+        Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
+        Member findMember = optionalMember.orElseThrow();
+        Optional<BorrowPost> optionalBorrowPost = borrowPostRepository.findBorrowPostByIdFetchMember(borrowPostId);
+        BorrowPost findBorrowPost = optionalBorrowPost.orElseThrow();
+        if (findBorrowPost.getMember() != findMember) {
+            throw new IllegalStateException("BORROW_POST DELETE ERROR");
+        }
+
+        // 지우는 로직
+        findBorrowPost.updateState(com.borrow_mine.BorrowMine.domain.borrow.State.DELETE);
+    }
+
     private void validateRequestBorrowPost(BorrowPost borrowPost, Member member) {
         if (borrowPost.getMember() == member) {
             throw new IllegalStateException("Request Member Error");
@@ -129,12 +146,6 @@ public class BorrowPostService {
         if (!(borrowPost.getState() == com.borrow_mine.BorrowMine.domain.borrow.State.ACTIVATE)) return;
 
         if (borrowPost.getPeriod().getStartDate().isBefore(LocalDate.now())) {
-            borrowPost.updateState(com.borrow_mine.BorrowMine.domain.borrow.State.DONE);
-            return;
-        }
-
-        Integer count = requestRepository.findAcceptRequestByBorrowPost(borrowPost);
-        if (count != 0) {
             borrowPost.updateState(com.borrow_mine.BorrowMine.domain.borrow.State.DONE);
         }
     }

@@ -1,6 +1,5 @@
 package com.borrow_mine.BorrowMine.repository.statistic;
 
-import com.borrow_mine.BorrowMine.domain.QStatistic;
 import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

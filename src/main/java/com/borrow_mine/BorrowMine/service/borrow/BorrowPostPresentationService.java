@@ -17,6 +17,7 @@ import com.borrow_mine.BorrowMine.repository.request.RequestRepository;
 import com.borrow_mine.BorrowMine.repository.statistic.StatisticRepository;
 import com.borrow_mine.BorrowMine.service.ImageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -47,7 +49,7 @@ public class BorrowPostPresentationService {
     }
 
     public BorrowListResponse getSmallBorrowPostPaging(Integer offset) {
-        List<BorrowPostSmall> borrowPostSmalls = borrowPostRepository.getBorrowPostSmallPaging(offset, 8);
+        List<BorrowPostSmall> borrowPostSmalls = borrowPostRepository.getBorrowPostSmallPaging(offset, 5);
         List<Long> ids = borrowPostSmalls.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
         List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
 

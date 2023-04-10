@@ -27,6 +27,8 @@ public class BorrowPostControllerAdvice {
             return new ErrorResult(e.getMessage(), 444);
         } else if (e.getMessage().equals("Request Period Error")) {
             return new ErrorResult(e.getMessage(), 555);
+        } else if (e.getMessage().equals("BORROW_POST DELETE ERROR")) {
+            return new ErrorResult("BORROW_POST DELETE ERROR", 666);
         }
         return null;
     }

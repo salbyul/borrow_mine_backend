@@ -1,6 +1,7 @@
 package com.borrow_mine.BorrowMine.repository.borrow;
 
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
+import com.borrow_mine.BorrowMine.domain.borrow.State;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.domain.member.QMember;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
@@ -26,6 +27,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
                 .from(borrowPost)
                 .leftJoin(borrowPost.member, member)
+                .where(borrowPost.state.ne(State.DELETE))
                 .orderBy(borrowPost.createdDate.desc())
                 .limit(2)
                 .fetch();
@@ -38,8 +40,10 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
                 .from(borrowPost)
                 .leftJoin(borrowPost.member, member)
+                .where(borrowPost.state.ne(State.DELETE))
                 .orderBy(borrowPost.createdDate.desc())
-                .limit(8)
+                .offset(offset)
+                .limit(limit)
                 .fetch();
     }
 
@@ -48,7 +52,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
         return queryFactory
                 .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
                 .from(borrowPost)
-                .where(borrowPost.member.eq(member))
+                .where(borrowPost.member.eq(member).and(borrowPost.state.ne(State.DELETE)))
                 .leftJoin(borrowPost.member, QMember.member)
                 .orderBy(borrowPost.createdDate.desc())
                 .fetch();
@@ -60,7 +64,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
         return queryFactory
                 .select(borrowPost.product)
                 .from(borrowPost)
-                .where(borrowPost.product.containsIgnoreCase(name))
+                .where(borrowPost.product.containsIgnoreCase(name).and(borrowPost.state.ne(State.DELETE)))
                 .distinct()
                 .limit(6)
                 .fetch();
@@ -70,7 +74,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
     public List<BorrowPost> findForWeek() {
         return queryFactory
                 .selectFrom(borrowPost)
-                .where(borrowPost.createdDate.after(LocalDateTime.now().minusWeeks(1)))
+                .where(borrowPost.createdDate.after(LocalDateTime.now().minusWeeks(1)).and(borrowPost.state.ne(State.DELETE)))
                 .fetch();
     }
 
@@ -78,7 +82,7 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
     public List<BorrowPost> findForMonth() {
         return queryFactory
                 .selectFrom(borrowPost)
-                .where(borrowPost.createdDate.after(LocalDateTime.now().minusMonths(1)))
+                .where(borrowPost.createdDate.after(LocalDateTime.now().minusMonths(1)).and(borrowPost.state.ne(State.DELETE)))
                 .fetch();
     }
 }

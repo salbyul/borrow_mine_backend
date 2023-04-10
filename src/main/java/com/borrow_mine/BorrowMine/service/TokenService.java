@@ -28,19 +28,6 @@ public class TokenService {
     }
 
     @Transactional
-    public void updateAccessToken(String preAccessToken, String newAccessToken, String refreshToken) {
-        Optional<Token> findToken = tokenRepository.findTokenByRefreshToken(refreshToken);
-        Token token = findToken.orElseThrow(); // if NULL
-
-        if (!token.getAccessToken().equals(preAccessToken)) {
-            tokenRepository.delete(token);
-            throw new IllegalStateException("TOKEN ERROR");
-        }
-
-        token.updateAccessToken(newAccessToken);
-    }
-
-    @Transactional
     public void updateToken(String newAccessToken, String preRefreshToken, String newRefreshToken) {
         Optional<Token> optionalToken = tokenRepository.findTokenByRefreshToken(preRefreshToken);
         Token token = optionalToken.orElseThrow();

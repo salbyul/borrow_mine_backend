@@ -7,6 +7,4 @@ import java.util.List;
 public interface StatisticRepositoryCustom {
 
     List<Statistic> findOrderByNumber(Integer limit);
-
-
 }

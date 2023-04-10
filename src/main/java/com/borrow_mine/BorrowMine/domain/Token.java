@@ -28,7 +28,7 @@ public class Token {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "modified_date")
+    @Column(name = "updated_date")
     private LocalDateTime modifiedDate;
 
     public Token(String nickname, String accessToken, String refreshToken) {

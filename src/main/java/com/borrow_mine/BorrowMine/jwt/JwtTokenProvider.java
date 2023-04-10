@@ -123,7 +123,19 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(accessToken)
                     .getBody();
-        } catch (ExpiredJwtException e) { // Refresh Token 확인
+            String findNickname = (String) claims.get("nickname");
+            Cookie[] cookies = request.getCookies();
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("nickname")) {
+                    if (!findNickname.equals(cookie.getValue())) {
+                        // 쿠키 조작 시 처리 로직 ( 토큰 기반 닉네임 변경 )
+                        log.error("쿠키 조작");
+                        cookie.setValue(findNickname);
+                    }
+                    log.info("쿠키 확인 완료");
+                }
+            }
+        } catch (ExpiredJwtException e) { // Access Token 확인
             log.error("EXPIRED ACCESS TOKEN");
             Cookie[] cookies = request.getCookies();
             for (Cookie cookie : cookies) {
@@ -138,7 +150,14 @@ public class JwtTokenProvider {
 //                        Access Token 갱신
                         String nickname = (String) body.get("nickname");
                         String newAccessToken = createAccessToken(nickname);
-                        tokenService.updateAccessToken(accessToken, newAccessToken, refreshToken);
+                        String newRefreshToken = createRefreshToken(nickname);
+                        tokenService.updateToken(newAccessToken, refreshToken, newRefreshToken);
+
+                        Cookie newRefreshTokenCookie = new Cookie("refreshToken", newRefreshToken);
+                        newRefreshTokenCookie.setMaxAge(60 * 30 * 1000);
+                        newRefreshTokenCookie.setDomain("localhost");
+                        newRefreshTokenCookie.setPath("/");
+                        newRefreshTokenCookie.setHttpOnly(true);
 
                         Cookie nicknameCookie = new Cookie("nickname", nickname);
                         nicknameCookie.setMaxAge(60 * 30 * 1000);

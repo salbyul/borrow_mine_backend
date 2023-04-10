@@ -33,15 +33,15 @@ public class BorrowPostController {
     private final CommentService commentService;
     private final ReportService reportService;
 
-//    TODO 이미지 가져올 때 포스트의 모든 정보를 가져오는 것 손봐야 할 것 같은 느낌
+    //    TODO 이미지 가져올 때 포스트의 모든 정보를 가져오는 것 손봐야 할 것 같은 느낌
     @GetMapping("/small_list")
     public BorrowListResponse getSmallList() {
         return borrowPostPresentationService.getSmallBorrowPost();
     }
 
     @GetMapping("/list")
-    public BorrowListResponse getList() {
-        return borrowPostPresentationService.getSmallBorrowPostPaging(0);
+    public BorrowListResponse getList(@RequestParam Integer offset) {
+        return borrowPostPresentationService.getSmallBorrowPostPaging(offset);
     }
 
     @GetMapping("/{id}")
@@ -99,7 +99,7 @@ public class BorrowPostController {
         return borrowPostPresentationService.getWroteList(nickname);
     }
 
-//    TODO 날짜 지난 게시물에 요청 불가능하게 해야함 && 상태에 따라서도 요청 불가능 해야함
+    //    TODO 날짜 지난 게시물에 요청 불가능하게 해야함 && 상태에 따라서도 요청 불가능 해야함
     @PutMapping("/request")
     public ResponseEntity<Object> borrowRequest(@CookieValue String nickname, @RequestParam Long id) {
         borrowPostService.requestBorrow(nickname, id);
@@ -133,6 +133,12 @@ public class BorrowPostController {
     @PostMapping("/request/refuse")
     public ResponseEntity<Object> refuseRequest(@RequestParam Long id) {
         borrowPostService.refuseRequestState(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> deleteBorrowPost(@PathVariable(name = "id") Long borrowPostId, @CookieValue String nickname) {
+        borrowPostService.deleteBorrowPost(borrowPostId, nickname);
         return ResponseEntity.ok().build();
     }
 

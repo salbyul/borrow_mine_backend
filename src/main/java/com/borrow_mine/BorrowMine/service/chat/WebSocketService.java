@@ -4,6 +4,7 @@ import com.borrow_mine.BorrowMine.ServerEndpointConfig;
 import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.chat.ChatDto;
+import com.borrow_mine.BorrowMine.exception.MemberException;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,8 +53,8 @@ public class WebSocketService {
         System.out.println("from: " + dto.getFrom());
         Optional<Member> from = memberRepository.findMemberByNickname(dto.getFrom());
         Optional<Member> to = memberRepository.findMemberByNickname(dto.getTarget());
-        Member fromMember = from.orElseThrow();
-        Member toMember = to.orElseThrow();
+        Member fromMember = from.orElseThrow(MemberException::new);
+        Member toMember = to.orElseThrow(MemberException::new);
         chatService.saveChatMessage(dto.getFrom(), dto.getTarget(), dto.getMessage());
 
         if (clients.containsKey(dto.getTarget())) {

@@ -9,18 +9,19 @@ import com.borrow_mine.BorrowMine.dto.member.MemberLoginDto;
 import com.borrow_mine.BorrowMine.dto.member.MemberModifyDto;
 import com.borrow_mine.BorrowMine.dto.member.ValidateMemberDto;
 import com.borrow_mine.BorrowMine.exception.DenyException;
+import com.borrow_mine.BorrowMine.exception.MemberException;
 import com.borrow_mine.BorrowMine.repository.DenyRepository;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.borrow_mine.BorrowMine.exception.MemberException.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,6 @@ public class MemberService {
     private final DenyRepository denyRepository;
     private final EncryptService encryptService;
 
-    //    TODO 비밀번호 그대로 저장하면 안된다!
     @Transactional
     public void join(MemberJoinDto memberJoinDto) {
 
@@ -44,9 +44,9 @@ public class MemberService {
 
     public Member login(MemberLoginDto memberLoginDto) {
         Optional<Member> findMember = memberRepository.findMemberByEmail(memberLoginDto.getEmail());
-        Member member = findMember.orElseThrow();
+        Member member = findMember.orElseThrow(() -> new MemberException(LOGIN_FAILED));
         if (!encryptService.isMatch(memberLoginDto.getPassword(), member.getPassword())) {
-            throw new NoSuchElementException();
+            throw new MemberException(LOGIN_FAILED);
         }
         return member;
     }
@@ -56,20 +56,20 @@ public class MemberService {
         Optional<Member> optionalFromMember = memberRepository.findMemberByNickname(fromMemberNickname);
         Optional<Member> optionalToMember = memberRepository.findMemberByNickname(toMemberNickname);
 
-        Member fromMember = optionalFromMember.orElseThrow();
-        Member toMember = optionalToMember.orElseThrow();
+        Member fromMember = optionalFromMember.orElseThrow(MemberException::new);
+        Member toMember = optionalToMember.orElseThrow(MemberException::new);
 
         Optional<Deny> findDeny = denyRepository.findByFromAndTo(fromMember, toMember);
 
         findDeny.ifPresent((d) -> {
-            throw new DuplicateRequestException("중복");
+            throw new DenyException(DenyException.DUPLICATE_DENY);
         });
         denyRepository.save(Deny.assembleDeny(fromMember, toMember));
     }
 
     public List<DenyDto> getDenyList(String nickname) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
-        List<Deny> denyList = denyRepository.findDenyByFrom(optionalMember.orElseThrow());
+        List<Deny> denyList = denyRepository.findDenyByFrom(optionalMember.orElseThrow(MemberException::new));
         return denyList.stream()
                 .map(d -> new DenyDto(d.getTo().getNickname(), d.getId()))
                 .collect(Collectors.toList());
@@ -78,28 +78,27 @@ public class MemberService {
     @Transactional
     public void removeDeny(Long denyId, String from) {
         Optional<Deny> findDeny = denyRepository.findOneById(denyId);
-        Deny deny = findDeny.orElseThrow();
+        Deny deny = findDeny.orElseThrow(DenyException::new);
         if (!deny.getFrom().getNickname().equals(from))
-            throw new DenyException(DenyException.forbiddenAccess, DenyException.forbiddenAccessCode);
+            throw new DenyException();
         denyRepository.delete(deny);
     }
 
     @Transactional
     public void modifyMember(String nickname, MemberModifyDto memberModifyDto) {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        Member member = findMember.orElseThrow();
+        Member member = findMember.orElseThrow(MemberException::new);
 
-        if (!member.getPassword().equals(memberModifyDto.getPassword()))
-            throw new IllegalStateException("Member Password Error");
+        if (!encryptService.isMatch(memberModifyDto.getPassword(), member.getPassword()))
+            throw new MemberException(PASSWORD_ERROR);
 
         if (memberModifyDto.getNickname().equals(member.getNickname())) {
             member.modify(memberModifyDto);
         } else {
             Optional<Member> nicknameMember = memberRepository.findMemberByNickname(memberModifyDto.getNickname());
-            if (nicknameMember.isPresent()) throw new IllegalStateException("Member Nickname Duplicate");
+            if (nicknameMember.isPresent()) throw new MemberException(DUPLICATE_NICKNAME);
             member.modify(memberModifyDto);
         }
-
     }
 
     public Optional<Deny> findDeny(Member from, Member to) {
@@ -107,24 +106,26 @@ public class MemberService {
     }
 
     public String validateChangePassword(ValidateMemberDto validateMemberDto) {
-        return memberRepository.findMemberWithoutPassword(validateMemberDto.getEmail(), validateMemberDto.getNickname(), validateMemberDto.getAddress()).orElseThrow();
+        return memberRepository.findMemberWithoutPassword(validateMemberDto.getEmail(), validateMemberDto.getNickname(), validateMemberDto.getAddress()).orElseThrow(MemberException::new);
     }
 
+//    비밀번호 잊어버렸을 시 사용
     @Transactional
     public void changePassword(String nickname, String password) {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        Member member = findMember.orElseThrow();
+        Member member = findMember.orElseThrow(MemberException::new);
         member.changePassword(encryptService.encrypt(password));
     }
 
+//    비밀번호 변경 시 사용
     @Transactional
     public void changePassword(String nickname, String currentPassword, String password) {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
-        Member member = findMember.orElseThrow();
+        Member member = findMember.orElseThrow(MemberException::new);
         if (!encryptService.isMatch(currentPassword, member.getPassword()))
-            throw new IllegalStateException("Member Password Error");
+            throw new MemberException(PASSWORD_ERROR);
         if (encryptService.isMatch(password, member.getPassword()))
-            throw new IllegalStateException("Member Password Duplicate");
+            throw new MemberException(DUPLICATE_PASSWORD);
         member.changePassword(encryptService.encrypt(password));
     }
 
@@ -136,14 +137,14 @@ public class MemberService {
 
     private void validateAddress(Address address) {
         if (address.getStreet().equals("") || address.getZipcode().equals("")) {
-            throw new IllegalStateException("Member Address Null");
+            throw new MemberException();
         }
     }
 
     private void validateNickname(String nickname) {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
         if (findMember.isPresent()) {
-            throw new IllegalStateException("Member Nickname Duplicate");
+            throw new MemberException(DUPLICATE_NICKNAME);
         }
     }
 
@@ -151,7 +152,7 @@ public class MemberService {
         Optional<Member> findMember = memberRepository.findMemberByEmail(email);
 
         if (findMember.isPresent()) {
-            throw new IllegalStateException("Member Email Duplicate");
+            throw new MemberException(DUPLICATE_EMAIL);
         }
     }
 }

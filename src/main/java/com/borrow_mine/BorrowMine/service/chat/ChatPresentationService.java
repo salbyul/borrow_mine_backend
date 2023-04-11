@@ -4,6 +4,7 @@ import com.borrow_mine.BorrowMine.domain.Deny;
 import com.borrow_mine.BorrowMine.domain.chat.Chat;
 import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.chat.ChatDto;
+import com.borrow_mine.BorrowMine.exception.MemberException;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.chat.ChatRepository;
 import com.borrow_mine.BorrowMine.service.MemberService;
@@ -28,8 +29,8 @@ public class ChatPresentationService {
     public List<ChatDto> getChatDtoList(String fromMemberNickname, String toMemberNickname) {
         Optional<Member> optionalFromMember = memberRepository.findMemberByNickname(fromMemberNickname);
         Optional<Member> optionalToMember = memberRepository.findMemberByNickname(toMemberNickname);
-        Member fromMember = optionalFromMember.orElseThrow();
-        Member toMember = optionalToMember.orElseThrow();
+        Member fromMember = optionalFromMember.orElseThrow(MemberException::new);
+        Member toMember = optionalToMember.orElseThrow(MemberException::new);
 
         Optional<Deny> deny = memberService.findDeny(fromMember, toMember);
         if (deny.isPresent()) {

@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -78,24 +77,23 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/deny/list")
+    public DenyResponse denyList(@CookieValue String nickname) {
+        List<DenyDto> denyList = memberService.getDenyList(nickname);
+        return DenyResponse.assembleDenyResponse(denyList, denyList.size());
+    }
+
     @GetMapping("/info")
     public ResponseEntity<MemberInfoDto> memberInfo(@CookieValue String nickname) {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
         return ResponseEntity.ok(new MemberInfoDto(findMember.orElseThrow()));
     }
 
-    //    TODO nickname으로 Member 찾는 모든 메서드는 서비스에서 하자 Transaction내에서 처리해야 할 것 같다 {{ !!!! 토큰 재발급 해야된다. !!!! }}
+    //    TODO {{ !!!! 토큰 재발급 해야된다. !!!! }}
     @PostMapping("/info")
-    public ResponseEntity<Object> memberModify(@Valid @RequestBody MemberModifyDto memberModifyDto, HttpServletRequest request) {
-        String nickname = (String) request.getAttribute("nickname");
+    public ResponseEntity<Object> memberModify(@Valid @RequestBody MemberModifyDto memberModifyDto, @CookieValue String nickname) {
         memberService.modifyMember(nickname, memberModifyDto);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/deny/list")
-    public DenyResponse denyList(@CookieValue String nickname) {
-        List<DenyDto> denyList = memberService.getDenyList(nickname);
-        return DenyResponse.assembleDenyResponse(denyList, denyList.size());
     }
 
     @DeleteMapping("/deny/delete/{id}")

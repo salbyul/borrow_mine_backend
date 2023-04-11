@@ -99,7 +99,6 @@ public class BorrowPostController {
         return borrowPostPresentationService.getWroteList(nickname);
     }
 
-    //    TODO 날짜 지난 게시물에 요청 불가능하게 해야함 && 상태에 따라서도 요청 불가능 해야함
     @PutMapping("/request")
     public ResponseEntity<Object> borrowRequest(@CookieValue String nickname, @RequestParam Long id) {
         borrowPostService.requestBorrow(nickname, id);

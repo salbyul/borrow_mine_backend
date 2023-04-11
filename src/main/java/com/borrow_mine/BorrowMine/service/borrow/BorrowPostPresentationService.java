@@ -10,6 +10,7 @@ import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
 import com.borrow_mine.BorrowMine.dto.borrow.ImageDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestAcceptDto;
 import com.borrow_mine.BorrowMine.dto.request.RequestDto;
+import com.borrow_mine.BorrowMine.exception.MemberException;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.borrow.BorrowPostRepository;
 import com.borrow_mine.BorrowMine.repository.image.ImageRepository;
@@ -61,7 +62,7 @@ public class BorrowPostPresentationService {
 
     public BorrowListResponse getWroteList(String nickname) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
-        Member findMember = optionalMember.orElseThrow();
+        Member findMember = optionalMember.orElseThrow(MemberException::new);
         List<BorrowPostSmall> borrowPostSmallList = borrowPostRepository.getBorrowPostSmallByMember(findMember);
         List<Long> ids = borrowPostSmallList.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
         List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
@@ -104,19 +105,19 @@ public class BorrowPostPresentationService {
 
     public List<RequestDto> getSentRequestDtoList(String nickname) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
-        Member findMember = optionalMember.orElseThrow();
+        Member findMember = optionalMember.orElseThrow(MemberException::new);
         return requestRepository.getSentRequestDtoListByMember(findMember);
     }
 
     public List<RequestDto> getReceivedRequestDtoList(String nickname) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
-        Member findMember = optionalMember.orElseThrow();
+        Member findMember = optionalMember.orElseThrow(MemberException::new);
         return requestRepository.getReceivedRequestDtoListByMember(findMember);
     }
 
     public List<RequestAcceptDto> getAcceptedDto(String nickname) {
         Optional<Member> optionalMember = memberRepository.findMemberByNickname(nickname);
-        Member findMember = optionalMember.orElseThrow();
+        Member findMember = optionalMember.orElseThrow(MemberException::new);
         return requestRepository.getAcceptedRequest(findMember);
     }
 

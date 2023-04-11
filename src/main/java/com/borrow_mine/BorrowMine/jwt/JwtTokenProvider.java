@@ -1,7 +1,9 @@
 package com.borrow_mine.BorrowMine.jwt;
 
+import com.borrow_mine.BorrowMine.exception.ErrorResult;
 import com.borrow_mine.BorrowMine.repository.TokenRepository;
 import com.borrow_mine.BorrowMine.service.TokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SecurityException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;

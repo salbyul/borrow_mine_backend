@@ -33,7 +33,6 @@ public class BorrowPostController {
     private final CommentService commentService;
     private final ReportService reportService;
 
-    //    TODO 이미지 가져올 때 포스트의 모든 정보를 가져오는 것 손봐야 할 것 같은 느낌
     @GetMapping("/small_list")
     public BorrowListResponse getSmallList() {
         return borrowPostPresentationService.getSmallBorrowPost();

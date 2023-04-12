@@ -33,4 +33,11 @@ public class TokenService {
         Token token = optionalToken.orElseThrow();
         token.updateToken(newAccessToken, newRefreshToken);
     }
+
+    @Transactional
+    public void updateAllByNickname(String newNickname, String newAccessToken, String newRefreshToken, String preNickname) {
+        Optional<Token> optionalToken = tokenRepository.findTokenByNickname(preNickname);
+        Token token = optionalToken.orElseThrow();
+        token.updateAll(newNickname, newAccessToken, newRefreshToken);
+    }
 }

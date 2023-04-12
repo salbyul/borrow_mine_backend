@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
@@ -33,7 +34,6 @@ public class MemberController {
     private final ChangePasswordService changePasswordService;
     private final TokenService tokenService;
 
-    //    TODO ResponseEntity 그대로 던져도 될까?
     @PutMapping("/join")
     public ResponseEntity<Object> joinMember(@Valid @RequestBody MemberJoinDto memberJoinDto) {
         memberService.join(memberJoinDto);
@@ -46,27 +46,13 @@ public class MemberController {
         String accessToken = jwtTokenProvider.createAccessToken(member.getNickname());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getNickname());
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setMaxAge(60 * 60 * 1000);
-        refreshTokenCookie.setDomain("localhost");
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setHttpOnly(true);
-        response.addCookie(refreshTokenCookie);
-
-        Cookie nicknameCookie = new Cookie("nickname", member.getNickname());
-        nicknameCookie.setMaxAge(60 * 60 * 1000);
-        nicknameCookie.setDomain("localhost");
-        nicknameCookie.setPath("/");
-        response.addCookie(nicknameCookie);
-
-
-        Cookie accessTokenCookie = new Cookie("SKAT", accessToken);
-        accessTokenCookie.setMaxAge(60 * 60 * 1000);
-        accessTokenCookie.setDomain("localhost");
-        accessTokenCookie.setPath("/");
-        response.addCookie(accessTokenCookie);
+        Cookie nicknameCookie = makeNicknameCookie(member.getNickname());
+        Cookie accessTokenCookie = makeAccessTokenCookie(accessToken);
+        Cookie refreshTokenCookie = makeRefreshTokenCookie(refreshToken);
 
         tokenService.saveToken(member.getNickname(), accessToken, refreshToken);
+
+        assembleCookieToResponse(response, nicknameCookie, accessTokenCookie, refreshTokenCookie);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -89,10 +75,21 @@ public class MemberController {
         return ResponseEntity.ok(new MemberInfoDto(findMember.orElseThrow()));
     }
 
-    //    TODO {{ !!!! 토큰 재발급 해야된다. !!!! }}
     @PostMapping("/info")
-    public ResponseEntity<Object> memberModify(@Valid @RequestBody MemberModifyDto memberModifyDto, @CookieValue String nickname) {
+    public ResponseEntity<Object> memberModify(@Valid @RequestBody MemberModifyDto memberModifyDto, @CookieValue String nickname, HttpServletResponse response) {
         memberService.modifyMember(nickname, memberModifyDto);
+        Cookie nicknameCookie = makeNicknameCookie(memberModifyDto.getNickname());
+
+        String accessToken = jwtTokenProvider.createAccessToken(memberModifyDto.getNickname());
+        Cookie accessTokenCookie = makeAccessTokenCookie(accessToken);
+
+        String refreshToken = jwtTokenProvider.createRefreshToken(memberModifyDto.getNickname());
+        Cookie refreshTokenCookie = makeRefreshTokenCookie(refreshToken);
+
+        tokenService.updateAllByNickname(memberModifyDto.getNickname(), accessToken, refreshToken, nickname);
+
+        assembleCookieToResponse(response, nicknameCookie, accessTokenCookie, refreshTokenCookie);
+
         return ResponseEntity.ok().build();
     }
 
@@ -121,5 +118,36 @@ public class MemberController {
     public ResponseEntity<Object> changePassword(@Valid @RequestBody PasswordDto passwordDto, @CookieValue String nickname) {
         memberService.changePassword(nickname, passwordDto.getCurrentPassword(), passwordDto.getPassword());
         return ResponseEntity.ok().build();
+    }
+
+    private void assembleCookieToResponse(HttpServletResponse response, Cookie... cookies) {
+        for (Cookie cookie : cookies) {
+            response.addCookie(cookie);
+        }
+    }
+
+    private Cookie makeNicknameCookie(String nickname) {
+        Cookie nicknameCookie = new Cookie("nickname", nickname);
+        nicknameCookie.setMaxAge(30 * 60); // 30분
+        nicknameCookie.setDomain("localhost");
+        nicknameCookie.setPath("/");
+        return nicknameCookie;
+    }
+
+    private Cookie makeAccessTokenCookie(String accessToken) {
+        Cookie accessTokenCookie = new Cookie("SKAT", accessToken);
+        accessTokenCookie.setMaxAge(30 * 60); // 30분
+        accessTokenCookie.setDomain("localhost");
+        accessTokenCookie.setPath("/");
+        return accessTokenCookie;
+    }
+
+    private Cookie makeRefreshTokenCookie(String refreshToken) {
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setMaxAge(60 * 60); // 1시간
+        refreshTokenCookie.setDomain("localhost");
+        refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setHttpOnly(true);
+        return refreshTokenCookie;
     }
 }

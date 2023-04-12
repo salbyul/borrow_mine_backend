@@ -1,19 +1,15 @@
 package com.borrow_mine.BorrowMine.web.controller.chat;
 
-import com.borrow_mine.BorrowMine.domain.member.Member;
 import com.borrow_mine.BorrowMine.dto.chat.ChatDto;
 import com.borrow_mine.BorrowMine.dto.chat.ChatResponse;
 import com.borrow_mine.BorrowMine.dto.chat.ChatRoomResponse;
-import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.service.chat.ChatPresentationService;
 import com.borrow_mine.BorrowMine.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor

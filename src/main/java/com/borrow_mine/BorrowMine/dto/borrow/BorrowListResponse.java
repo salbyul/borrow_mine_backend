@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 public class BorrowListResponse {
 
-//    TODO 좋은 설계 생각하기
     private List<BorrowPostSmall> borrowPosts;
     private int offset;
 

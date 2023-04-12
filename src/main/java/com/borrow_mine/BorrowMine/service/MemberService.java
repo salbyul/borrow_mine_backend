@@ -89,9 +89,11 @@ public class MemberService {
         Optional<Member> findMember = memberRepository.findMemberByNickname(nickname);
         Member member = findMember.orElseThrow(MemberException::new);
 
+//        비밀번호 확인
         if (!encryptService.isMatch(memberModifyDto.getPassword(), member.getPassword()))
             throw new MemberException(PASSWORD_ERROR);
 
+//        닉네임이 변경되었는지 확인하고 변경이 되었다면 닉네임 중복검사를 진행하고 변경
         if (memberModifyDto.getNickname().equals(member.getNickname())) {
             member.modify(memberModifyDto);
         } else {

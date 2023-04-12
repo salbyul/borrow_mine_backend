@@ -5,17 +5,12 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-// TODO id product로 변경
 @Entity
 @NoArgsConstructor
 @Getter
 public class Statistic {
 
-    @Id @GeneratedValue
-    @Column(name = "statistic_id")
-    private Long id;
-
-    @Column(unique = true)
+    @Id
     private String product;
 
     private Integer number;

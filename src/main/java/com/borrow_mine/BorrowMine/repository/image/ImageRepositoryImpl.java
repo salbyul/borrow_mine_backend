@@ -1,6 +1,8 @@
 package com.borrow_mine.BorrowMine.repository.image;
 
 import com.borrow_mine.BorrowMine.domain.Image;
+import com.borrow_mine.BorrowMine.dto.ImageWithoutBorrowPostDto;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,18 @@ public class ImageRepositoryImpl implements ImageRepositoryCustom{
                 .from(image)
                 .leftJoin(image.borrowPost, borrowPost).fetchJoin()
                 .where(borrowPost.id.in(ids))
+                .orderBy(image.borrowPost.id.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<ImageWithoutBorrowPostDto> findImageWithoutDtoByBorrowPostIdIn(Collection<Long> ids) {
+
+        return queryFactory
+                .select(Projections.fields(ImageWithoutBorrowPostDto.class, image.name, image.borrowPost.id.as("borrowPostId")))
+                .from(image)
+                .leftJoin(image.borrowPost, borrowPost)
+                .where(image.borrowPost.id.in(ids))
                 .orderBy(image.borrowPost.id.asc())
                 .fetch();
     }

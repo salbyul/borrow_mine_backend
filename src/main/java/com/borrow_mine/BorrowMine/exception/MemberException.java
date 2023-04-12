@@ -37,7 +37,6 @@ public class MemberException extends RuntimeException{
         this.code = FORBIDDEN_ACCESS_CODE;
     }
 
-//    에러 추가시 case 추가해야됨
     private int getCode(String message) {
         switch (message) {
             case DUPLICATE_EMAIL:

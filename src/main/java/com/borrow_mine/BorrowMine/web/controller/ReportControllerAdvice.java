@@ -1,6 +1,6 @@
 package com.borrow_mine.BorrowMine.web.controller;
 
-import com.borrow_mine.BorrowMine.exception.ErrorResult;
+import com.borrow_mine.BorrowMine.exception.ErrorResponse;
 import com.borrow_mine.BorrowMine.exception.ReportException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,8 +15,8 @@ public class ReportControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ReportException.class)
-    public ErrorResult reportException(ReportException e) {
+    public ErrorResponse reportException(ReportException e) {
         log.error(e.getMessage());
-        return new ErrorResult(e.getMessage(), e.getCode());
+        return new ErrorResponse(e.getMessage(), e.getCode());
     }
 }

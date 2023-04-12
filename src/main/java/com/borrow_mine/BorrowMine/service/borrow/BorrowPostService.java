@@ -64,7 +64,7 @@ public class BorrowPostService {
         imageService.saveImage(imageList, borrowPost);
         String product = borrowPost.getProduct();
 
-        Optional<Statistic> findStatistic = statisticRepository.findByProduct(product);
+        Optional<Statistic> findStatistic = statisticRepository.findById(product);
         if (findStatistic.isEmpty()) {
             statisticRepository.save(new Statistic(product));
         } else {

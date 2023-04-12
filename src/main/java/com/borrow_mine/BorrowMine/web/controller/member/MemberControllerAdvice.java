@@ -1,7 +1,7 @@
 package com.borrow_mine.BorrowMine.web.controller.member;
 
 import com.borrow_mine.BorrowMine.exception.DenyException;
-import com.borrow_mine.BorrowMine.exception.ErrorResult;
+import com.borrow_mine.BorrowMine.exception.ErrorResponse;
 import com.borrow_mine.BorrowMine.exception.MemberException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,17 +15,17 @@ public class MemberControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MemberException.class)
-    public ErrorResult memberException(MemberException e) {
+    public ErrorResponse memberException(MemberException e) {
         log.error(e.getMessage());
-        return new ErrorResult(e.getMessage(), e.getCode());
+        return new ErrorResponse(e.getMessage(), e.getCode());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DenyException.class)
-    public ErrorResult denyException(DenyException e) {
+    public ErrorResponse denyException(DenyException e) {
         log.error(e.getMessage());
 
-        return new ErrorResult(e.getMessage(), e.getCode());
+        return new ErrorResponse(e.getMessage(), e.getCode());
     }
 
 }

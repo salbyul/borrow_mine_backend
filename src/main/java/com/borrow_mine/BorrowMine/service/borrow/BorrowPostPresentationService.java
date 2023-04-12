@@ -4,6 +4,7 @@ import com.borrow_mine.BorrowMine.domain.Image;
 import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
+import com.borrow_mine.BorrowMine.dto.ImageWithoutBorrowPostDto;
 import com.borrow_mine.BorrowMine.dto.PopularProductDto;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowListResponse;
 import com.borrow_mine.BorrowMine.dto.borrow.BorrowPostSmall;
@@ -42,7 +43,7 @@ public class BorrowPostPresentationService {
     public BorrowListResponse getSmallBorrowPost() {
         List<BorrowPostSmall> borrowPostSmalls = borrowPostRepository.getBorrowPostSmall();
         List<Long> ids = borrowPostSmalls.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
-        List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
+        List<ImageWithoutBorrowPostDto> images = imageRepository.findImageWithoutDtoByBorrowPostIdIn(ids);
 
         addImageDtoList(borrowPostSmalls, images);
 
@@ -52,7 +53,7 @@ public class BorrowPostPresentationService {
     public BorrowListResponse getSmallBorrowPostPaging(Integer offset) {
         List<BorrowPostSmall> borrowPostSmalls = borrowPostRepository.getBorrowPostSmallPaging(offset, 5);
         List<Long> ids = borrowPostSmalls.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
-        List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
+        List<ImageWithoutBorrowPostDto> images = imageRepository.findImageWithoutDtoByBorrowPostIdIn(ids);
 
         addImageDtoList(borrowPostSmalls, images);
 
@@ -65,7 +66,7 @@ public class BorrowPostPresentationService {
         Member findMember = optionalMember.orElseThrow(MemberException::new);
         List<BorrowPostSmall> borrowPostSmallList = borrowPostRepository.getBorrowPostSmallByMember(findMember);
         List<Long> ids = borrowPostSmallList.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
-        List<Image> images = imageRepository.findImageByBorrowPostIdIn(ids);
+        List<ImageWithoutBorrowPostDto> images = imageRepository.findImageWithoutDtoByBorrowPostIdIn(ids);
 
         addImageDtoList(borrowPostSmallList, images);
 
@@ -121,10 +122,10 @@ public class BorrowPostPresentationService {
         return requestRepository.getAcceptedRequest(findMember);
     }
 
-    private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<Image> images) {
+    private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<ImageWithoutBorrowPostDto> images) {
         images.forEach(i -> {
             for (BorrowPostSmall borrowPostSmall : borrowPostSmalls) {
-                if (i.getBorrowPost().getId().equals(borrowPostSmall.getId())) {
+                if (i.getBorrowPostId().equals(borrowPostSmall.getId())) {
                     try {
                         borrowPostSmall.getImageDtoList().add(new ImageDto(imageService.imageNameToImage(i.getName()), i.getName()));
                     } catch (IOException e) {

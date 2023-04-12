@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface ChatRepository extends JpaRepository<Chat, Long>, ChatRepositoryCustom {
+public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("select cr.to.nickname from ChatRoom cr where cr.from = :from")
     List<String> findChatRoomList(@Param("from") Member from);

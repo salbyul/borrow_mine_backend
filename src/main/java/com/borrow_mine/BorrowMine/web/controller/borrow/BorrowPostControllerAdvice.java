@@ -1,7 +1,7 @@
 package com.borrow_mine.BorrowMine.web.controller.borrow;
 
 import com.borrow_mine.BorrowMine.exception.BorrowPostException;
-import com.borrow_mine.BorrowMine.exception.ErrorResult;
+import com.borrow_mine.BorrowMine.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,8 +14,8 @@ public class BorrowPostControllerAdvice {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BorrowPostException.class)
-    public ErrorResult illegalState(BorrowPostException e) {
+    public ErrorResponse illegalState(BorrowPostException e) {
         log.error(e.getMessage());
-        return new ErrorResult(e.getMessage(), e.getCode());
+        return new ErrorResponse(e.getMessage(), e.getCode());
     }
 }

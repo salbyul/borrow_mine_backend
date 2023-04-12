@@ -33,7 +33,6 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .fetch();
     }
 
-//    TODO Paging 기능 추가해야함
     @Override
     public List<BorrowPostSmall> getBorrowPostSmallPaging(Integer offset, Integer limit) {
         return queryFactory

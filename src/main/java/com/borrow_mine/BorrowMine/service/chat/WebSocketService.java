@@ -49,13 +49,11 @@ public class WebSocketService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         ChatDto dto = objectMapper.readValue(message, ChatDto.class);
-        System.out.println("dto = " + dto);
-        System.out.println("from: " + dto.getFrom());
         Optional<Member> from = memberRepository.findMemberByNickname(dto.getFrom());
         Optional<Member> to = memberRepository.findMemberByNickname(dto.getTarget());
         Member fromMember = from.orElseThrow(MemberException::new);
         Member toMember = to.orElseThrow(MemberException::new);
-        chatService.saveChatMessage(dto.getFrom(), dto.getTarget(), dto.getMessage());
+        chatService.saveChatMessage(fromMember, toMember, dto.getMessage());
 
         if (clients.containsKey(dto.getTarget())) {
             Optional<Deny> denyOne = memberService.findDeny(fromMember, toMember);

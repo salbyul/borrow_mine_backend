@@ -7,7 +7,6 @@ import com.borrow_mine.BorrowMine.exception.ChatException;
 import com.borrow_mine.BorrowMine.exception.MemberException;
 import com.borrow_mine.BorrowMine.repository.MemberRepository;
 import com.borrow_mine.BorrowMine.repository.chat.ChatRepository;
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +32,12 @@ public class ChatService {
     }
 
     @Transactional
+    public void createChatRoom(Member fromMember, Member toMember) {
+        validate(fromMember, toMember);
+        em.persist(ChatRoom.createChatRoom(fromMember, toMember));
+    }
+
+    @Transactional
     public void createChatRoom(String fromMemberNickname, String toMemberNickname) {
         Optional<Member> optionalFromMember = memberRepository.findMemberByNickname(fromMemberNickname);
         Optional<Member> optionalToMember = memberRepository.findMemberByNickname(toMemberNickname);
@@ -43,14 +48,10 @@ public class ChatService {
     }
 
     @Transactional
-    public void saveChatMessage(String fromMemberNickname, String toMemberNickname, String message) {
-        Optional<Member> optionalFromMember = memberRepository.findMemberByNickname(fromMemberNickname);
-        Optional<Member> optionalToMember = memberRepository.findMemberByNickname(toMemberNickname);
-        Member fromMember = optionalFromMember.orElseThrow(MemberException::new);
-        Member toMember = optionalToMember.orElseThrow(MemberException::new);
+    public void saveChatMessage(Member fromMember, Member toMember, String message) {
         Optional<ChatRoom> findChatRoom = chatRepository.findChatRoomByFromAndTo(toMember, fromMember);
         if (findChatRoom.isEmpty()) {
-            createChatRoom(toMemberNickname, fromMemberNickname);
+            createChatRoom(toMember, fromMember);
         }
         Chat chat = Chat.assembleChatMessage(fromMember, toMember, message);
         chatRepository.save(chat);

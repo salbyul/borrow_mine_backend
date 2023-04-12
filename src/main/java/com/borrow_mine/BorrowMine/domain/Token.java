@@ -48,4 +48,10 @@ public class Token {
         this.refreshToken = refreshToken;
         this.modifiedDate = LocalDateTime.now();
     }
+
+    public void updateAll(String nickname, String accessToken, String refreshToken) {
+        this.nickname = nickname;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
 }

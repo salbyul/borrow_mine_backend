@@ -20,4 +20,6 @@ public interface BorrowPostRepositoryCustom {
 
     List<BorrowPost> findForMonth();
 
+    List<BorrowPostSmall> getBookmarkedList(String nickname);
+
 }

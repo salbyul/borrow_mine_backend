@@ -84,4 +84,17 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .where(borrowPost.createdDate.after(LocalDateTime.now().minusMonths(1)).and(borrowPost.state.ne(State.DELETE)))
                 .fetch();
     }
+
+//    TODO bookmark한 것들 가져와야댐
+    @Override
+    public List<BorrowPostSmall> getBookmarkedList(String nickname) {
+        return queryFactory
+                .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
+                .from(borrowPost)
+                .leftJoin(borrowPost.member, member)
+                .where(borrowPost.state.ne(State.DELETE))
+                .orderBy(borrowPost.createdDate.desc())
+                .fetch();
+    }
+
 }

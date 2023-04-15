@@ -122,6 +122,10 @@ public class BorrowPostPresentationService {
         return requestRepository.getAcceptedRequest(findMember);
     }
 
+    public BorrowListResponse getBookmarkedList(String nickname) {
+
+    }
+
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<ImageWithoutBorrowPostDto> images) {
         images.forEach(i -> {
             for (BorrowPostSmall borrowPostSmall : borrowPostSmalls) {

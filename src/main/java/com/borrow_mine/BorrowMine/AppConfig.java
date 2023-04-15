@@ -35,7 +35,7 @@ public class AppConfig implements WebMvcConfigurer {
 //                Comment
                 "/comment/save", "/comment/report/*",
 //                Borrow
-                "/borrow/report/*", "/borrow/create", "/borrow/wrote", "/borrow/request/*", "/borrow/delete/*",
+                "/borrow/report/*", "/borrow/create", "/borrow/wrote", "/borrow/request/*", "/borrow/delete/*", "/borrow/bookmark/*",
 //                Member
                 "/member/deny/*",
                 "/member/info/*",

@@ -13,6 +13,7 @@ import com.borrow_mine.BorrowMine.service.*;
 import com.borrow_mine.BorrowMine.service.borrow.BorrowPostPresentationService;
 import com.borrow_mine.BorrowMine.service.borrow.BorrowPostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/borrow")
@@ -29,6 +31,7 @@ public class BorrowPostController {
 
     private final BorrowPostPresentationService borrowPostPresentationService;
     private final BorrowPostService borrowPostService;
+    private final BookmarkService bookmarkService;
     private final ImageService imageService;
     private final CommentService commentService;
     private final ReportService reportService;
@@ -44,13 +47,31 @@ public class BorrowPostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BorrowDetailResponse> getBorrowDetail(@PathVariable("id") Long borrowPostId) {
+    public ResponseEntity<BorrowDetailResponse> getBorrowDetail(@PathVariable("id") Long borrowPostId, @CookieValue(required = false) String nickname) {
 
         BorrowDetail detail = borrowPostService.getDetail(borrowPostId);
         detail.setImageDtoList(imageService.getImageDtoByBorrowPostId(borrowPostId));
         detail.setCommentDtoList(commentService.getCommentDtoList(borrowPostId));
-        BorrowDetailResponse response = BorrowDetailResponse.assembleBorrowDetailResponse(detail);
+
+        BorrowDetailResponse response = BorrowDetailResponse.assembleBorrowDetailResponse(detail, bookmarkService.isBookmark(nickname, borrowPostId));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/bookmark")
+    public BorrowListResponse getBookmarkList(@CookieValue String nickname) {
+
+    }
+
+    @PostMapping("/bookmark")
+    public ResponseEntity<Object> bookmark(@RequestParam(name = "borrow_post_id") Long borrowPostId, @CookieValue String nickname) {
+        bookmarkService.saveBookmark(nickname, borrowPostId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/bookmark")
+    public ResponseEntity<Object> deleteBookmark(@RequestParam(name = "borrow_post_id") Long borrowPostId, @CookieValue String nickname) {
+        bookmarkService.deleteBookmark(nickname, borrowPostId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/report/{id}")

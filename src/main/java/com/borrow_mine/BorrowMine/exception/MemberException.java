@@ -18,6 +18,9 @@ public class MemberException extends RuntimeException{
     public static final String DUPLICATE_PASSWORD = "Member Password Duplicate";
     private final int DUPLICATE_PASSWORD_CODE = 103;
 
+    public static final String DUPLICATE_BOOKMARK = "Member Bookmark Duplicate";
+    private final int DUPLICATE_BOOKMARK_CODE = 104;
+
     public static final String PASSWORD_ERROR = "Member Password Error";
     private final int PASSWORD_ERROR_CODE = 401;
 
@@ -49,6 +52,8 @@ public class MemberException extends RuntimeException{
                 return PASSWORD_ERROR_CODE;
             case LOGIN_FAILED:
                 return LOGIN_FAILED_CODE;
+            case DUPLICATE_BOOKMARK:
+                return DUPLICATE_BOOKMARK_CODE;
             default:
                 return FORBIDDEN_ACCESS_CODE;
         }

@@ -11,10 +11,12 @@ import lombok.Setter;
 public class BorrowDetailResponse {
 
     private BorrowDetail borrowDetail;
+    private Boolean isBookmark;
 
-    public static BorrowDetailResponse assembleBorrowDetailResponse(BorrowDetail borrowDetail) {
+    public static BorrowDetailResponse assembleBorrowDetailResponse(BorrowDetail borrowDetail, Boolean isBookmark) {
         BorrowDetailResponse borrowDetailResponse = new BorrowDetailResponse();
         borrowDetailResponse.setBorrowDetail(borrowDetail);
+        borrowDetailResponse.setIsBookmark(isBookmark);
         return borrowDetailResponse;
     }
 }

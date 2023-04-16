@@ -1,6 +1,5 @@
 package com.borrow_mine.BorrowMine.service.borrow;
 
-import com.borrow_mine.BorrowMine.domain.Image;
 import com.borrow_mine.BorrowMine.domain.Statistic;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.member.Member;
@@ -123,7 +122,12 @@ public class BorrowPostPresentationService {
     }
 
     public BorrowListResponse getBookmarkedList(String nickname) {
+        List<BorrowPostSmall> bookmarkedList = borrowPostRepository.getBookmarkedList(nickname);
+        List<Long> ids = bookmarkedList.stream().map(BorrowPostSmall::getId).collect(Collectors.toList());
+        List<ImageWithoutBorrowPostDto> images = imageRepository.findImageWithoutDtoByBorrowPostIdIn(ids);
 
+        addImageDtoList(bookmarkedList, images);
+        return BorrowListResponse.assembleBorrowSmallList(bookmarkedList);
     }
 
     private void addImageDtoList(List<BorrowPostSmall> borrowPostSmalls, List<ImageWithoutBorrowPostDto> images) {

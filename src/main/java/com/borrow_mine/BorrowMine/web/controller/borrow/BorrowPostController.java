@@ -59,7 +59,7 @@ public class BorrowPostController {
 
     @GetMapping("/bookmark")
     public BorrowListResponse getBookmarkList(@CookieValue String nickname) {
-
+        return borrowPostPresentationService.getBookmarkedList(nickname);
     }
 
     @PostMapping("/bookmark")

@@ -1,5 +1,6 @@
 package com.borrow_mine.BorrowMine.repository.borrow;
 
+import com.borrow_mine.BorrowMine.domain.QBookmark;
 import com.borrow_mine.BorrowMine.domain.borrow.BorrowPost;
 import com.borrow_mine.BorrowMine.domain.borrow.State;
 import com.borrow_mine.BorrowMine.domain.member.Member;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.borrow_mine.BorrowMine.domain.QBookmark.*;
 import static com.borrow_mine.BorrowMine.domain.borrow.QBorrowPost.*;
 import static com.borrow_mine.BorrowMine.domain.member.QMember.*;
 
@@ -57,7 +59,6 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .fetch();
     }
 
-    //    %name%가 맞나
     @Override
     public List<String> getProductName(String name) {
         return queryFactory
@@ -85,14 +86,13 @@ public class BorrowPostRepositoryImpl implements BorrowPostRepositoryCustom{
                 .fetch();
     }
 
-//    TODO bookmark한 것들 가져와야댐
     @Override
     public List<BorrowPostSmall> getBookmarkedList(String nickname) {
         return queryFactory
                 .select(Projections.fields(BorrowPostSmall.class, borrowPost.createdDate, borrowPost.member.nickname, borrowPost.title, borrowPost.id))
                 .from(borrowPost)
-                .leftJoin(borrowPost.member, member)
-                .where(borrowPost.state.ne(State.DELETE))
+                .leftJoin(borrowPost.bookmarks, bookmark)
+                .where(borrowPost.state.ne(State.DELETE).and(borrowPost.id.eq(bookmark.borrowPost.id)).and(bookmark.member.nickname.eq(nickname)))
                 .orderBy(borrowPost.createdDate.desc())
                 .fetch();
     }

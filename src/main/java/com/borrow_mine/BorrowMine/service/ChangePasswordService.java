@@ -5,11 +5,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ChangePasswordService {
 
-    private static Map<String, Component> session = new HashMap<>();
+    private static Map<String, Component> session = new ConcurrentHashMap<>();
 
     @AllArgsConstructor
     static class Component {
@@ -20,19 +21,7 @@ public class ChangePasswordService {
 //    요청이 들어올 때마다 세션을 청소한다.
     public String save(String nickname) {
 
-        Set<String> keySet = session.keySet();
-
-        for (String s : keySet) {
-            Component component = session.get(s);
-            if (component != null) {
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime plus = component.time.plusHours(1);
-                if (now.isAfter(plus)) {
-                    session.remove(s);
-                }
-            }
-        }
-
+        cleanSession();
         LocalDateTime now = LocalDateTime.now();
         String uuid = UUID.randomUUID().toString();
         Component component = new Component(now, nickname);
@@ -54,5 +43,21 @@ public class ChangePasswordService {
         session.remove(uuid);
 
         return Optional.of(nickname);
+    }
+
+    public void cleanSession() {
+
+        Set<String> keySet = session.keySet();
+
+        for (String s : keySet) {
+            Component component = session.get(s);
+            if (component != null) {
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime plus = component.time.plusHours(1);
+                if (now.isAfter(plus)) {
+                    session.remove(s);
+                }
+            }
+        }
     }
 }

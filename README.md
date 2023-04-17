@@ -24,6 +24,3 @@
   - 채팅방 생성, 채팅방 삭제
 - 인기 제품
   - 주간, 월간, 무기한 범위의 게시글로 올라온 제품의 순위를 볼 수 있음
-
-## 자세한 내용
-[보러가기](https://loud-punishment-0ef.notion.site/Borrow_Mine-bb280e18960044e98c629c8728e60ffd)

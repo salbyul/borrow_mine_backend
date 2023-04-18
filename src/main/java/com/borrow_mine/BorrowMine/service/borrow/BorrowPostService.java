@@ -43,13 +43,12 @@ public class BorrowPostService {
     private final StatisticRepository statisticRepository;
     private final ImageService imageService;
 
-//    여기서 부터 exception 걸린거 하나하나 확인하고 리액트에서 예외처리 다 바꿔줘야함!!!
     @Transactional
     public BorrowDetail getDetail(Long borrowPostId) {
         Optional<BorrowPost> findBorrowPost = borrowPostRepository.findBorrowPostByIdFetchMember(borrowPostId);
         BorrowPost borrowPost = findBorrowPost.orElseThrow(BorrowPostException::new);
         if (borrowPost.getState() == com.borrow_mine.BorrowMine.domain.borrow.State.DELETE) {
-            throw new BorrowPostException(BORROW_POST_DELETE);
+            throw new BorrowPostException(FORBIDDEN_ACCESS);
         }
         updateState(borrowPost);
         return new BorrowDetail(borrowPost);
